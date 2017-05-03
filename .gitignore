@@ -1,0 +1,6 @@
+#ignore build files
+build
+
+#ignore *.bak *.swp
+*.bak
+*.swp
