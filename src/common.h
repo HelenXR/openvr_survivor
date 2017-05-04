@@ -11,6 +11,7 @@
 //namespace
 using namespace std;
 using namespace vr;
+using namespace google;
 
 //import lib
 #pragma comment(lib,"libglog.lib")

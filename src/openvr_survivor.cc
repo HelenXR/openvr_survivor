@@ -1,7 +1,8 @@
 #include "common.h"
-
+#include "server_provider.h"
 #define HMD_DLL_EXPORT extern "C" __declspec( dllexport )
 
+CServerProvider g_CServerProvider;
 HMD_DLL_EXPORT void *HmdDriverFactory(const char *pInterfaceName, int *pReturnCode)
 {
 	//set log dir:steam/logs,you can set,you can set the path you want, but you need to make sure 
@@ -9,14 +10,15 @@ HMD_DLL_EXPORT void *HmdDriverFactory(const char *pInterfaceName, int *pReturnCo
 	FLAGS_log_dir = "../../../logs";
     //programe name:"openvr_survivor_glog"
     google::InitGoogleLogging("openvr_survivor_glog");
-    LOG(INFO) << "google log first info level message!";
+    LOG(INFO) << "google log first info level message! " << pInterfaceName;
     //...... DoSomething
     //Shutdown google's logging library.
-    google::ShutdownGoogleLogging();
+    //google::ShutdownGoogleLogging();
+	
 	if (0 == strcmp(IServerTrackedDeviceProvider_Version, pInterfaceName))
 	{
 		//return &g_serverDriverNull;
-		return NULL;
+		return (void *)&g_CServerProvider;
 	}
 	if (0 == strcmp(IVRWatchdogProvider_Version, pInterfaceName))
 	{

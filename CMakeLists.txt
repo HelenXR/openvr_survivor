@@ -19,7 +19,7 @@ find_library(GLOG_LIBRARY libglog.lib HINTS third_party/glog/lib)
 file(COPY  third_party/glog/lib/libglog.dll DESTINATION ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE})
 
 #generate dll
-add_library(driver_openvr_survivor SHARED src/openvr_survivor.cc)
+add_library(driver_openvr_survivor SHARED src/openvr_survivor.cc src/server_provider.cc)
 
 #set link libraries
 target_link_libraries(driver_openvr_survivor ${GLOG_LIBRARY})
