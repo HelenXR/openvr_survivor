@@ -1,6 +1,7 @@
 #ifndef OPENVR_SURVIVOR_SRC_SERVER_PROVIDER_H_
 #define OPENVR_SURVIVOR_SRC_SERVER_PROVIDER_H_
 #include "common.h"
+#include "head_mount_display_device.h"
 
 using namespace vr;
 class CServerProvider : public IServerTrackedDeviceProvider{
@@ -16,6 +17,8 @@ public:
 	virtual bool ShouldBlockStandbyMode() override;
 	virtual void EnterStandby() override;
 	virtual void LeaveStandby() override;
+private:
+	CHeadMountDisplayDevice *m_pHeadMountDisplay;
 };
 
 #endif

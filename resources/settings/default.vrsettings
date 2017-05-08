@@ -1,0 +1,15 @@
+{
+   "driver_helenxr" : {
+      "enable" : true,
+      "serialNumber" : "HelenXR",
+      "modelNumber" : "Model_V1.0",
+      "windowX" : 0,
+      "windowY" : 0,
+      "windowWidth" : 1920,
+      "windowHeight" : 1080,
+      "renderWidth" : 1920,
+      "renderHeight" : 1080,
+      "secondsFromVsyncToPhotons" : 0.011,
+      "displayFrequency" : 0
+   }
+}
