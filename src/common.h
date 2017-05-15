@@ -9,6 +9,8 @@
 #include <openvr_driver.h>
 #include <thread>
 #include <chrono>
+#include "function_configure.h"
+
 //namespace
 using namespace std;
 using namespace vr;
