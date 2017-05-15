@@ -23,7 +23,7 @@ file(COPY resources/icons DESTINATION openvr_survivor/resources)
 file(COPY resources/settings DESTINATION openvr_survivor/resources)
 
 #generate dll
-add_library(driver_openvr_survivor SHARED src/openvr_survivor.cc src/server_provider.cc src/head_mount_display_device.cc)
+add_library(driver_openvr_survivor SHARED src/openvr_survivor.cc src/server_provider.cc src/head_mount_display_device.cc src/keyboard_monitor.cc)
 
 #set link libraries
 target_link_libraries(driver_openvr_survivor ${GLOG_LIBRARY})
