@@ -36,10 +36,14 @@ CHeadMountDisplayDevice::CHeadMountDisplayDevice(){
 	//create report hmd pose thread
 	m_tReportPoseThread = std::thread(&CHeadMountDisplayDevice::ReportPoseThread ,this);
 	m_bReportPoseThreadState = true;
+	
+#if defined(HMD_ROTATE_BY_KEYBOARD) || defined(HMD_POSITION_BY_KEYBOARD)
+	m_pKeyBoardMonitor = new KeyBoardMonitor();
+#endif
 }
 
 CHeadMountDisplayDevice::~CHeadMountDisplayDevice(){
-
+	delete m_pKeyBoardMonitor;
 }
 
 EVRInitError CHeadMountDisplayDevice::Activate(uint32_t unObjectId){
@@ -211,7 +215,7 @@ void CHeadMountDisplayDevice::ReportPoseThread(){
 		{
 			vr::VRServerDriverHost()->TrackedDevicePoseUpdated( m_unObjectId, GetPose(), sizeof( DriverPose_t ) );
 		}
-		LOG_EVERY_N(INFO,60) << "pose loop!" ;
+		LOG_EVERY_N(INFO,60*10) << "pose loop!" ;
 		
 		FlushLogFiles(GLOG_INFO);
 		pollDeadline += retryInterval;

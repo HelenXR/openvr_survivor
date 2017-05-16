@@ -2,6 +2,10 @@
 #define OPENVR_SURVIVOR_SRC_HEAD_MOUNT_DISPLAY_DEVICE_H_
 #include "common.h"
 #include <thread>
+#if defined(HMD_ROTATE_BY_KEYBOARD) || defined(HMD_POSITION_BY_KEYBOARD)
+#include "keyboard_monitor.h"
+#endif	
+
 // keys for use with the settings API
 static const char * const k_pch_Sample_Section = "driver_helenxr";
 static const char * const k_pch_Sample_SerialNumber_String = "serialNumber";
@@ -58,5 +62,8 @@ private:
 	
 	std::thread m_tReportPoseThread;
 	bool m_bReportPoseThreadState;                //false:stop true:running.
+#if defined(HMD_ROTATE_BY_KEYBOARD) || defined(HMD_POSITION_BY_KEYBOARD)
+	KeyBoardMonitor *m_pKeyBoardMonitor;
+#endif	
 };
 #endif
