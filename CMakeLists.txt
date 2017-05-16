@@ -3,8 +3,11 @@ cmake_minimum_required (VERSION 2.8)
 #project name:openvr_survivor
 project(openvr_survivor)
 
-#set include path
-include_directories(include third_party/openvr/include third_party/glog/include)
+#set include
+FILE(GLOB_RECURSE HEADER_FILES_GLOB third_party/openvr/include/*.h include/*.h third_party/glog/include/*.h)
+set(HEADER_FILES include third_party/openvr/include third_party/glog/include)
+set(SOURCE_FILES src/openvr_survivor.cc src/server_provider.cc src/head_mount_display_device.cc src/keyboard_monitor.cc)
+include_directories(${HEADER_FILES})
 
 #set output path
 math(EXPR BITS "8*${CMAKE_SIZEOF_VOID_P}")
@@ -23,7 +26,7 @@ file(COPY resources/icons DESTINATION openvr_survivor/resources)
 file(COPY resources/settings DESTINATION openvr_survivor/resources)
 
 #generate dll
-add_library(driver_openvr_survivor SHARED src/openvr_survivor.cc src/server_provider.cc src/head_mount_display_device.cc src/keyboard_monitor.cc)
+add_library(driver_openvr_survivor SHARED ${SOURCE_FILES} ${HEADER_FILES} ${HEADER_FILES_GLOB})
 
 #set link libraries
 target_link_libraries(driver_openvr_survivor ${GLOG_LIBRARY})
