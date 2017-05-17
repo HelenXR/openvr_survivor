@@ -140,6 +140,12 @@ DriverPose_t CHeadMountDisplayDevice::GetPose(){
 #if defined(HMD_ROTATE_BY_KEYBOARD)
     pose.qRotation = m_pKeyBoardMonitor->GetHMDPose().qRotation;
 #endif
+
+#if defined(HMD_POSITION_BY_KEYBOARD)
+	pose.vecPosition[0] = m_pKeyBoardMonitor->GetHMDPose().vecPosition[0];
+	pose.vecPosition[1] = m_pKeyBoardMonitor->GetHMDPose().vecPosition[1];
+	pose.vecPosition[2] = m_pKeyBoardMonitor->GetHMDPose().vecPosition[2];
+#endif
 	return pose;
 }
 

@@ -94,27 +94,38 @@ void KeyBoardMonitor::KeyBoardForHMDPoseUpdate(){
 #endif
 
 #if defined(HMD_POSITION_BY_KEYBOARD)
+#define KEYBOARD_POSITION_STEP    0.1
 	if (KBC(VK_NUMPAD8)) {
+		m_sHMDPose.vecPosition[2] -= KEYBOARD_POSITION_STEP;
 		LOG(INFO) << "8 Click!" << endl;
 	}
 	if (KBC(VK_NUMPAD2)) {
+		m_sHMDPose.vecPosition[2] += KEYBOARD_POSITION_STEP;
 		LOG(INFO) << "2 Click!" << endl;
 	}
 	if (KBC(VK_NUMPAD4)) {
+		m_sHMDPose.vecPosition[0] -= KEYBOARD_POSITION_STEP;
 		LOG(INFO) << "4 Click!" << endl;
 	}
 	if (KBC(VK_NUMPAD6)) {
+		m_sHMDPose.vecPosition[0] += KEYBOARD_POSITION_STEP;
 		LOG(INFO) << "6 Click!" << endl;
 	}
 	if (KBC(VK_NUMPAD9)) {
+		m_sHMDPose.vecPosition[1] += KEYBOARD_POSITION_STEP;
 		LOG(INFO) << "9 Click!" << endl;
 	}
 	if (KBC(VK_NUMPAD1)) {
+		m_sHMDPose.vecPosition[1] -= KEYBOARD_POSITION_STEP;
 		LOG(INFO) << "1 Click!" << endl;
 	}
 	if (KBC(VK_NUMPAD5)) {
+		m_sHMDPose.vecPosition[0] = 0.0;
+		m_sHMDPose.vecPosition[1] = 0.0;
+		m_sHMDPose.vecPosition[2] = 0.0;
 		LOG(INFO) << "5 Click!" << endl;
 	}
+	LOG(INFO) << "vecPosition(" << m_sHMDPose.vecPosition[0] << "," << m_sHMDPose.vecPosition[1] << "," << m_sHMDPose.vecPosition[2] << ")";
 #endif
 }
 //yaw range:-90~90 pitch range:-180~180 roll range:-180~180.
