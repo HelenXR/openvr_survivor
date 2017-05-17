@@ -137,6 +137,9 @@ DriverPose_t CHeadMountDisplayDevice::GetPose(){
 	pose.qWorldFromDriverRotation = HmdQuaternion_Init( 1, 0, 0, 0 );
 	pose.qDriverFromHeadRotation = HmdQuaternion_Init( 1, 0, 0, 0 );
 	
+#if defined(HMD_ROTATE_BY_KEYBOARD)
+    pose.qRotation = m_pKeyBoardMonitor->GetHMDPose().qRotation;
+#endif
 	return pose;
 }
 
