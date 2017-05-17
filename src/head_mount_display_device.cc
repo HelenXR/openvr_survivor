@@ -38,7 +38,7 @@ CHeadMountDisplayDevice::CHeadMountDisplayDevice(){
 	m_bReportPoseThreadState = true;
 	
 #if defined(HMD_ROTATE_BY_KEYBOARD) || defined(HMD_POSITION_BY_KEYBOARD)
-	m_pKeyBoardMonitor = new KeyBoardMonitor();
+	m_pKeyBoardMonitor = KeyBoardMonitor::GetInstance();
 #endif
 }
 

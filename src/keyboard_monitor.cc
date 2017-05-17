@@ -1,5 +1,13 @@
 #include "keyboard_monitor.h"
 
+KeyBoardMonitor *KeyBoardMonitor::m_pKeyBoardMonitor = NULL;
+KeyBoardMonitor* KeyBoardMonitor::GetInstance(){
+	if(NULL == m_pKeyBoardMonitor){
+		m_pKeyBoardMonitor = new KeyBoardMonitor();
+		LOG(INFO) << "new KeyBoardMonitor.";
+	}
+	return m_pKeyBoardMonitor;
+}
 KeyBoardMonitor::KeyBoardMonitor() : m_bDetectKeyBoardThreadState(true){
 	DriverPose_t pose = {0};
 	m_sHMDPose = pose;

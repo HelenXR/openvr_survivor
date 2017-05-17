@@ -9,11 +9,13 @@
 #define KBC(x)               (GetAsyncKeyState(x) & 0x0001)
 class KeyBoardMonitor{
 public:
-	KeyBoardMonitor();
+	static KeyBoardMonitor* GetInstance();
 	~KeyBoardMonitor();
 	DriverPose_t GetHMDPose();
 	bool GetDetectKeyBoardThreadState();
 	bool SetDetectKeyBoardThreadState(bool new_state);
+protected:	
+	KeyBoardMonitor();
 private:
 	void DetectKeyBoardThread();
 	void KeyBoardForHMDPoseUpdate();
@@ -21,5 +23,6 @@ private:
 	std::thread m_tDetectKeyBoardThread;
 	bool m_bDetectKeyBoardThreadState;//0:stop 1:running
 	DriverPose_t m_sHMDPose;
+	static KeyBoardMonitor *m_pKeyBoardMonitor;
 };
 #endif
