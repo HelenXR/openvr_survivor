@@ -37,7 +37,7 @@ CHeadMountDisplayDevice::CHeadMountDisplayDevice(){
 	m_tReportPoseThread = std::thread(&CHeadMountDisplayDevice::ReportPoseThread ,this);
 	m_bReportPoseThreadState = true;
 	
-#if defined(HMD_ROTATE_BY_KEYBOARD) || defined(HMD_POSITION_BY_KEYBOARD)
+#if defined(HMD_ROTATE_BY_KEYBOARD) || defined(HMD_POSITION_BY_KEYBOARD) 
 	m_pKeyBoardMonitor = KeyBoardMonitor::GetInstance();
 #endif
 }

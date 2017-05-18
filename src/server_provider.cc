@@ -20,10 +20,17 @@ vr::EVRInitError CServerProvider::Init( IVRDriverContext *pDriverContext ){
 	//init modules contains:VRServerDriverHost,VRSettings,VRProperties,VRDriverLog.
 	VR_INIT_SERVER_DRIVER_CONTEXT( pDriverContext );
 	
+	//create HMD device
 	m_pHeadMountDisplay = new CHeadMountDisplayDevice();
 	vr::VRServerDriverHost()->TrackedDeviceAdded( m_pHeadMountDisplay->GetSerialNumber().c_str(), vr::TrackedDeviceClass_HMD, m_pHeadMountDisplay );
 	
-    LOG(INFO) << "CServerProvider end.";
+	//create controller device.
+	m_pHandControllerDevice[LEFT_HAND_CONTROLLER] = new CHandControllerDevice("Left Controller",TrackedControllerRole_LeftHand);
+	vr::VRServerDriverHost()->TrackedDeviceAdded(m_pHandControllerDevice[0]->GetSerialNumber(), vr::TrackedDeviceClass_Controller, m_pHandControllerDevice[0]);
+	m_pHandControllerDevice[RIGHT_HAND_CONTROLLER] = new CHandControllerDevice("Right Controller",TrackedControllerRole_RightHand);
+	vr::VRServerDriverHost()->TrackedDeviceAdded(m_pHandControllerDevice[1]->GetSerialNumber(), vr::TrackedDeviceClass_Controller, m_pHandControllerDevice[1]);
+    
+	LOG(INFO) << "CServerProvider end.";
 	return VRInitError_None;
 }
 

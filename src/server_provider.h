@@ -2,6 +2,7 @@
 #define OPENVR_SURVIVOR_SRC_SERVER_PROVIDER_H_
 #include "common.h"
 #include "head_mount_display_device.h"
+#include "hand_controller_device.h"
 
 using namespace vr;
 class CServerProvider : public IServerTrackedDeviceProvider{
@@ -19,6 +20,7 @@ public:
 	virtual void LeaveStandby() override;
 private:
 	CHeadMountDisplayDevice *m_pHeadMountDisplay;
+	CHandControllerDevice *m_pHandControllerDevice[HAND_CONTROLLER_COUNT];
 };
 
 #endif

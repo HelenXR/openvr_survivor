@@ -45,4 +45,14 @@ inline void HmdMatrix_SetIdentity( HmdMatrix34_t *pMatrix )
 	pMatrix->m[2][3] = 0.f;
 }
 
+typedef enum HAND_CONTROLLER{
+    LEFT_HAND_CONTROLLER = 0,
+	RIGHT_HAND_CONTROLLER,
+	HAND_CONTROLLER_COUNT
+}EHandController;
+
+//unit:meter
+#define HAND_CONTROLLER_RELATIVE_HMD_POSITION_X			0.2
+#define HAND_CONTROLLER_RELATIVE_HMD_POSITION_Y			0.2
+#define HAND_CONTROLLER_RELATIVE_HMD_POSITION_Z			0.5
 #endif
