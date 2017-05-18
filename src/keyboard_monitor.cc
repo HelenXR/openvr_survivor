@@ -27,6 +27,11 @@ KeyBoardMonitor::KeyBoardMonitor() : m_bDetectKeyBoardThreadState(true){
 	m_sControllerPose[RIGHT_HAND_CONTROLLER].vecPosition[1] = -HAND_CONTROLLER_RELATIVE_HMD_POSITION_Y;
 	m_sControllerPose[RIGHT_HAND_CONTROLLER].vecPosition[2] = -HAND_CONTROLLER_RELATIVE_HMD_POSITION_Z;
 	
+	//init left/right controller's button state.
+	KeyBoardForControllerButton button_clear = { 0 };
+	m_KeyBoardForControllerButton[LEFT_HAND_CONTROLLER] = button_clear;
+	m_KeyBoardForControllerButton[RIGHT_HAND_CONTROLLER] = button_clear;
+
 	//create thread for detect keyboard input.
 	m_tDetectKeyBoardThread = std::thread(&KeyBoardMonitor::DetectKeyBoardThread, this);
 }
@@ -44,7 +49,10 @@ DriverPose_t KeyBoardMonitor::GetControllerPose(EHandController hand_controller)
 	LOG_IF(ERROR, hand_controller >= HAND_CONTROLLER_COUNT);
 	return m_sControllerPose[hand_controller];
 }
-
+KeyBoardForControllerButton KeyBoardMonitor::GetControllerButtonState(EHandController hand_controller) {
+	LOG_IF(ERROR, hand_controller >= HAND_CONTROLLER_COUNT);
+	return m_KeyBoardForControllerButton[hand_controller];
+}
 void KeyBoardMonitor::DetectKeyBoardThread() {
 	LOG(INFO) << "DetectKeyBoardThread:run!";
 	auto retryInterval = std::chrono::milliseconds(100);
@@ -165,11 +173,23 @@ yaw:'j'  left, 'l' right.
 pitch:'i' up, 'k' or ',' down.
 roll:'u' anticlockwise,'o' clockwise.
 other function:'.' clear rotate.
+
 right controller position information:
 forward:'VK_UP',back:'VK_DOWN'.
 right:'VK_RIGHT',left:'VK_LEFT'.
 up:'VK_NUMPAD0',down:'VK_RCONTROL'.
 other function:'VK_DECIMAL' clear position.
+
+right controller button information:
+1.Menu button:'VK_BACK'
+2.Trackedpad Left:'VK_KEY_F'
+3.Trackedpad Up:'VK_KEY_T'
+4.Trackedpad Right:'VK_KEY_H'
+5.Trackedpad Down:'VK_KEY_G' or 'VK_KEY_B'
+6.System Button:'VK_ESCAPE'
+7.Trigger:'VK_SPACE'
+8.Grip Button:'VK_KEY_9'
+9.Trackpad Press:'VK_KEY_0'
 */
 void KeyBoardMonitor::KeyBoardForControllerPoseAndButtonUpdate() {
 
@@ -247,7 +267,61 @@ void KeyBoardMonitor::KeyBoardForControllerPoseAndButtonUpdate() {
 	}
 	LOG_EVERY_N(INFO, 10 * 10) << "Controller vecPosition(" << m_sHMDPose.vecPosition[0] << "," << m_sHMDPose.vecPosition[1] << "," << m_sHMDPose.vecPosition[2] << ")";
 #endif
-	//button update
+
+	//right hand button update
+	uint16_t button_state = 0x00;
+	if (KBT(VK_BACK)) {
+		button_state |= CONTROLLER_BUTTON_MENU;
+		LOG(INFO) << "VK_BACK Touch!" << endl;
+	}
+	if (KBT(VK_KEY_F)) {
+		button_state |= CONTROLLER_BUTTON_PAD_LEFT;
+		LOG(INFO) << "VK_KEY_F Touch!" << endl;
+	}
+	if (KBT(VK_KEY_T)) {
+		button_state |= CONTROLLER_BUTTON_PAD_UP;
+		LOG(INFO) << "VK_KEY_T Touch!" << endl;
+	}
+	if (KBT(VK_KEY_H)) {
+		button_state |= CONTROLLER_BUTTON_PAD_RIGHT;
+		LOG(INFO) << "VK_KEY_H Touch!" << endl;
+	}
+	if (KBT(VK_KEY_G)) {
+		button_state |= CONTROLLER_BUTTON_PAD_DOWN;
+		LOG(INFO) << "VK_KEY_G Touch!" << endl;
+	}
+	if (KBT(VK_KEY_B)) {
+		button_state |= CONTROLLER_BUTTON_PAD_DOWN;
+		LOG(INFO) << "VK_KEY_B Touch!" << endl;
+	}
+	if (KBT(VK_ESCAPE)) {
+		button_state |= CONTROLLER_BUTTON_SYSTEM;
+		LOG(INFO) << "VK_ESCAPE Touch!" << endl;
+	}
+	if (KBT(VK_SPACE)) {
+		button_state |= CONTROLLER_BUTTON_TRIGGER;
+		LOG(INFO) << "VK_SPACE Touch!" << endl;
+	}
+	if (KBT(VK_KEY_9)) {
+		button_state |= CONTROLLER_BUTTON_GRIP;
+		LOG(INFO) << "VK_KEY_9 Touch!" << endl;
+	}
+	if (KBT(VK_KEY_0)) {
+		button_state |= CONTROLLER_BUTTON_TRACKEPAD_PRESS;
+		LOG(INFO) << "VK_KEY_0 Touch!" << endl;
+	}
+	//for test
+	float trigger_x;
+	if (KBT(VK_KEY_7)) {
+		trigger_x = 0.2f;
+		LOG(INFO) << "VK_KEY_7 Touch!" << endl;
+	}
+	if (KBT(VK_KEY_8)) {
+		trigger_x = 0.8f;
+		LOG(INFO) << "VK_KEY_8 Touch!" << endl;
+	}
+	m_KeyBoardForControllerButton[RIGHT_HAND_CONTROLLER].ButtonState = button_state;
+	m_KeyBoardForControllerButton[RIGHT_HAND_CONTROLLER].rAxis[1].x = trigger_x;
 }
 //yaw range:-90~90 pitch range:-180~180 roll range:-180~180.
 HmdQuaternion_t KeyBoardMonitor::RotateQuaternionByYawPitchRoll(const HmdQuaternion_t quaternion_origin,double yaw_degree,double pitch_degree,double roll_degree){

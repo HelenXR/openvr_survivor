@@ -6,6 +6,7 @@
 #include "keyboard_monitor.h"
 
 
+typedef void (vr::IVRServerDriverHost::*ButtonUpdate)(uint32_t unWhichDevice, vr::EVRButtonId eButtonId, double eventTimeOffset);
 class CHandControllerDevice : public ITrackedDeviceServerDriver,public IVRControllerComponent{
 public:
 	CHandControllerDevice(string serial_number,ETrackedControllerRole controller_role);
@@ -28,6 +29,8 @@ public:
 	const uint32_t GetUniqueObjectId();
 private:
 	void ReportPoseButtonThread();
+	void GetButtonState(KeyBoardForControllerButton button_state);
+	void SendButtonUpdates(ButtonUpdate ButtonEvent, uint64_t ulMask);
 	string m_sSerialNumber;
 	uint32_t m_nUniqueObjectId;
 	DriverPose_t m_Pose;
@@ -39,6 +42,6 @@ private:
 #if defined(CONTROLLER_ROTATE_BY_KEYBOARD) || defined(CONTROLLER_POSITION_BY_KEYBOARD)
 	KeyBoardMonitor *m_pKeyBoardMonitor;
 #endif	
-	double m_dHandControllerDefaultPosition[2][3];
 };
+
 #endif

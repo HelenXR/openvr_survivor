@@ -55,4 +55,20 @@ typedef enum HAND_CONTROLLER{
 #define HAND_CONTROLLER_RELATIVE_HMD_POSITION_X			0.2
 #define HAND_CONTROLLER_RELATIVE_HMD_POSITION_Y			0.2
 #define HAND_CONTROLLER_RELATIVE_HMD_POSITION_Z			0.5
+
+//keyboard for controller button struct
+typedef struct KeyBoardForControllerButton_{
+	uint16_t ButtonState;
+	VRControllerAxis_t rAxis[k_unControllerStateAxisCount];
+}KeyBoardForControllerButton;
+
+#define CONTROLLER_BUTTON_MENU				(1<<0)
+#define CONTROLLER_BUTTON_PAD_LEFT			(1<<1)
+#define CONTROLLER_BUTTON_PAD_UP			(1<<2)
+#define CONTROLLER_BUTTON_PAD_RIGHT			(1<<3)
+#define CONTROLLER_BUTTON_PAD_DOWN			(1<<4)
+#define CONTROLLER_BUTTON_SYSTEM			(1<<5)
+#define CONTROLLER_BUTTON_TRIGGER			(1<<6)
+#define CONTROLLER_BUTTON_GRIP				(1<<7)
+#define CONTROLLER_BUTTON_TRACKEPAD_PRESS	(1<<8)
 #endif
