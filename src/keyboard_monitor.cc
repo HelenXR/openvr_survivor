@@ -18,14 +18,14 @@ KeyBoardMonitor::KeyBoardMonitor() : m_bDetectKeyBoardThreadState(true){
 	//init left/right controller's pose position.
 	m_sControllerPose[LEFT_HAND_CONTROLLER] = pose;
 	m_sControllerPose[LEFT_HAND_CONTROLLER].qRotation.w = 1.0;// quaternion origin(1.0,0.0,0.0,0.0).
-	m_sControllerPose[LEFT_HAND_CONTROLLER].vecPosition[0] = -HAND_CONTROLLER_RELATIVE_HMD_POSITION_X;
-	m_sControllerPose[LEFT_HAND_CONTROLLER].vecPosition[1] = -HAND_CONTROLLER_RELATIVE_HMD_POSITION_Y;
-	m_sControllerPose[LEFT_HAND_CONTROLLER].vecPosition[2] = -HAND_CONTROLLER_RELATIVE_HMD_POSITION_Z;
+	m_sControllerPose[LEFT_HAND_CONTROLLER].vecPosition[0] = 0;
+	m_sControllerPose[LEFT_HAND_CONTROLLER].vecPosition[1] = 0;
+	m_sControllerPose[LEFT_HAND_CONTROLLER].vecPosition[2] = 0;
 	m_sControllerPose[RIGHT_HAND_CONTROLLER] = pose;
 	m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation.w = 1.0;// quaternion origin(1.0,0.0,0.0,0.0).
-	m_sControllerPose[RIGHT_HAND_CONTROLLER].vecPosition[0] = HAND_CONTROLLER_RELATIVE_HMD_POSITION_X;
-	m_sControllerPose[RIGHT_HAND_CONTROLLER].vecPosition[1] = -HAND_CONTROLLER_RELATIVE_HMD_POSITION_Y;
-	m_sControllerPose[RIGHT_HAND_CONTROLLER].vecPosition[2] = -HAND_CONTROLLER_RELATIVE_HMD_POSITION_Z;
+	m_sControllerPose[RIGHT_HAND_CONTROLLER].vecPosition[0] = 0;
+	m_sControllerPose[RIGHT_HAND_CONTROLLER].vecPosition[1] = 0;
+	m_sControllerPose[RIGHT_HAND_CONTROLLER].vecPosition[2] = 0;
 	
 	//init left/right controller's button state.
 	KeyBoardForControllerButton button_clear = { 0 };
@@ -59,7 +59,7 @@ void KeyBoardMonitor::DetectKeyBoardThread() {
 	auto pollDeadline = std::chrono::steady_clock::now();
 
 	while (m_bDetectKeyBoardThreadState) {
-		LOG_EVERY_N(INFO, 10*10) << "DetectKeyBoardThread loop!";
+		//LOG_EVERY_N(INFO, 10*10) << "DetectKeyBoardThread loop!";
 
 		//keyboard for HMD
 		KeyBoardForHMDPoseUpdate();
@@ -94,6 +94,7 @@ position information:
 	note:The numeric key above is the numeric key on the right.
 */
 void KeyBoardMonitor::KeyBoardForHMDPoseUpdate(){
+	bool position_changed = false;
 
 #if defined(HMD_ROTATE_BY_KEYBOARD)
 #define KEYBOARD_FOR_HMD_ROTATE_STEP_DEGREE                  10
@@ -133,37 +134,54 @@ void KeyBoardMonitor::KeyBoardForHMDPoseUpdate(){
 
 #if defined(HMD_POSITION_BY_KEYBOARD)
 #define KEYBOARD_FOR_HMD_POSITION_STEP    0.1
+	double position_move[3] = {0};
 	if (KBC(VK_NUMPAD8)) {
-		m_sHMDPose.vecPosition[2] -= KEYBOARD_FOR_HMD_POSITION_STEP;
+		position_move[2] = -KEYBOARD_FOR_HMD_POSITION_STEP;
+		position_changed = true;
 		LOG(INFO) << "8 Click!" << endl;
 	}
 	if (KBC(VK_NUMPAD2)) {
-		m_sHMDPose.vecPosition[2] += KEYBOARD_FOR_HMD_POSITION_STEP;
+		position_move[2] = KEYBOARD_FOR_HMD_POSITION_STEP;
+		position_changed = true;
 		LOG(INFO) << "2 Click!" << endl;
 	}
 	if (KBC(VK_NUMPAD4)) {
-		m_sHMDPose.vecPosition[0] -= KEYBOARD_FOR_HMD_POSITION_STEP;
+		position_move[0] = -KEYBOARD_FOR_HMD_POSITION_STEP;
+		position_changed = true;
 		LOG(INFO) << "4 Click!" << endl;
 	}
 	if (KBC(VK_NUMPAD6)) {
-		m_sHMDPose.vecPosition[0] += KEYBOARD_FOR_HMD_POSITION_STEP;
+		position_move[0] = KEYBOARD_FOR_HMD_POSITION_STEP;
+		position_changed = true;
 		LOG(INFO) << "6 Click!" << endl;
 	}
 	if (KBC(VK_NUMPAD9)) {
-		m_sHMDPose.vecPosition[1] += KEYBOARD_FOR_HMD_POSITION_STEP;
+		position_move[1] = KEYBOARD_FOR_HMD_POSITION_STEP;
+		position_changed = true;
 		LOG(INFO) << "9 Click!" << endl;
 	}
 	if (KBC(VK_NUMPAD1)) {
-		m_sHMDPose.vecPosition[1] -= KEYBOARD_FOR_HMD_POSITION_STEP;
+		position_move[1] = -KEYBOARD_FOR_HMD_POSITION_STEP;
+		position_changed = true;
 		LOG(INFO) << "1 Click!" << endl;
 	}
+
+	if(position_changed){
+		position_changed = false;
+		glm_adapter::QuaternionMultiplyDouble3(m_sHMDPose.qRotation, position_move, position_move);
+		LOG(INFO) << "hmd vecposition(" << position_move[0] << "," << position_move[1] << "," << position_move[2] << ")";
+		m_sHMDPose.vecPosition[0] += position_move[0];
+		m_sHMDPose.vecPosition[1] += position_move[1];
+		m_sHMDPose.vecPosition[2] += position_move[2];		
+	}
+	
 	if (KBC(VK_NUMPAD5)) {
 		m_sHMDPose.vecPosition[0] = 0.0;
 		m_sHMDPose.vecPosition[1] = 0.0;
 		m_sHMDPose.vecPosition[2] = 0.0;
 		LOG(INFO) << "5 Click!" << endl;
 	}
-	LOG_EVERY_N(INFO,10*10) << "HMD vecPosition(" << m_sHMDPose.vecPosition[0] << "," << m_sHMDPose.vecPosition[1] << "," << m_sHMDPose.vecPosition[2] << ")";
+//	LOG_EVERY_N(INFO,10*10) << "HMD vecPosition(" << m_sHMDPose.vecPosition[0] << "," << m_sHMDPose.vecPosition[1] << "," << m_sHMDPose.vecPosition[2] << ")";
 #endif
 }
 
@@ -192,9 +210,7 @@ right controller button information:
 9.Trackpad Press:'VK_KEY_0'
 */
 void KeyBoardMonitor::KeyBoardForControllerPoseAndButtonUpdate() {
-
-	//LEFT HAND pose update
-	//......future will fill in.
+	bool right_hand_position_changed = false;
 
 	//RIGHT HAND pose update
 #if defined(CONTROLLER_ROTATE_BY_KEYBOARD)
@@ -235,37 +251,56 @@ void KeyBoardMonitor::KeyBoardForControllerPoseAndButtonUpdate() {
 
 #if defined(CONTROLLER_POSITION_BY_KEYBOARD)
 #define KEYBOARD_FOR_CONTROLLER_POSITION_STEP    0.1
+	double right_hand_position_move[3] = {0};
 	if (KBC(VK_UP)) {
-		m_sControllerPose[RIGHT_HAND_CONTROLLER].vecPosition[2] -= KEYBOARD_FOR_CONTROLLER_POSITION_STEP;
+		right_hand_position_move[2] = -KEYBOARD_FOR_CONTROLLER_POSITION_STEP;
+		right_hand_position_changed = true;
 		LOG(INFO) << "VK_UP Click!" << endl;
 	}
 	if (KBC(VK_DOWN)) {
-		m_sControllerPose[RIGHT_HAND_CONTROLLER].vecPosition[2] += KEYBOARD_FOR_CONTROLLER_POSITION_STEP;
+		right_hand_position_move[2] = KEYBOARD_FOR_CONTROLLER_POSITION_STEP;
+		right_hand_position_changed = true;
 		LOG(INFO) << "VK_DOWN Click!" << endl;
 	}
 	if (KBC(VK_LEFT)) {
-		m_sControllerPose[RIGHT_HAND_CONTROLLER].vecPosition[0] -= KEYBOARD_FOR_CONTROLLER_POSITION_STEP;
+		right_hand_position_move[0] = -KEYBOARD_FOR_CONTROLLER_POSITION_STEP;
+		right_hand_position_changed = true;
 		LOG(INFO) << "VK_LEFT Click!" << endl;
 	}
 	if (KBC(VK_RIGHT)) {
-		m_sControllerPose[RIGHT_HAND_CONTROLLER].vecPosition[0] += KEYBOARD_FOR_CONTROLLER_POSITION_STEP;
+		right_hand_position_move[0] = KEYBOARD_FOR_CONTROLLER_POSITION_STEP;
+		right_hand_position_changed = true;
 		LOG(INFO) << "VK_RIGHT Click!" << endl;
 	}
 	if (KBC(VK_NUMPAD0)) {
-		m_sControllerPose[RIGHT_HAND_CONTROLLER].vecPosition[1] += KEYBOARD_FOR_CONTROLLER_POSITION_STEP;
+		right_hand_position_move[1] = KEYBOARD_FOR_CONTROLLER_POSITION_STEP;
+		right_hand_position_changed = true;
 		LOG(INFO) << "VK_NUMPAD0 Click!" << endl;
 	}
 	if (KBC(VK_RCONTROL)) {
-		m_sControllerPose[RIGHT_HAND_CONTROLLER].vecPosition[1] -= KEYBOARD_FOR_CONTROLLER_POSITION_STEP;
+		right_hand_position_move[1] = -KEYBOARD_FOR_CONTROLLER_POSITION_STEP;
+		right_hand_position_changed = true;
 		LOG(INFO) << "1 Click!" << endl;
 	}
+
+
+	if(right_hand_position_changed){
+		//vr::HmdQuaternion_t rotate_mix = glm_adapter::QuaternionMultiplyQuaternion(m_sHMDPose.qRotation,m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation);;
+		right_hand_position_changed = false;
+		glm_adapter::QuaternionMultiplyDouble3(m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation, right_hand_position_move, right_hand_position_move);
+		LOG(INFO) << "right  position(" << right_hand_position_move[0] << "," << right_hand_position_move[1] << "," << right_hand_position_move[2] << ")";
+		m_sControllerPose[RIGHT_HAND_CONTROLLER].vecPosition[0] += right_hand_position_move[0];
+		m_sControllerPose[RIGHT_HAND_CONTROLLER].vecPosition[1] += right_hand_position_move[1];
+		m_sControllerPose[RIGHT_HAND_CONTROLLER].vecPosition[2] += right_hand_position_move[2];		
+	}
+		
 	if (KBC(VK_DECIMAL)) {
-		m_sControllerPose[RIGHT_HAND_CONTROLLER].vecPosition[0] = 0.2;
-		m_sControllerPose[RIGHT_HAND_CONTROLLER].vecPosition[1] = -0.2;
-		m_sControllerPose[RIGHT_HAND_CONTROLLER].vecPosition[2] = -0.5;
+		m_sControllerPose[RIGHT_HAND_CONTROLLER].vecPosition[0] = 0;
+		m_sControllerPose[RIGHT_HAND_CONTROLLER].vecPosition[1] = 0;
+		m_sControllerPose[RIGHT_HAND_CONTROLLER].vecPosition[2] = 0;
 		LOG(INFO) << "VK_DECIMAL Click!" << endl;
 	}
-	LOG_EVERY_N(INFO, 10 * 10) << "Controller vecPosition(" << m_sHMDPose.vecPosition[0] << "," << m_sHMDPose.vecPosition[1] << "," << m_sHMDPose.vecPosition[2] << ")";
+//	LOG_EVERY_N(INFO, 10 * 10) << "Controller vecPosition(" << m_sHMDPose.vecPosition[0] << "," << m_sHMDPose.vecPosition[1] << "," << m_sHMDPose.vecPosition[2] << ")";
 #endif
 
 	//right hand button update
@@ -322,6 +357,10 @@ void KeyBoardMonitor::KeyBoardForControllerPoseAndButtonUpdate() {
 	}
 	m_KeyBoardForControllerButton[RIGHT_HAND_CONTROLLER].ButtonState = button_state;
 	m_KeyBoardForControllerButton[RIGHT_HAND_CONTROLLER].rAxis[1].x = trigger_x;
+
+
+	//left hand pose update as-is right hand
+	
 }
 //yaw range:-90~90 pitch range:-180~180 roll range:-180~180.
 HmdQuaternion_t KeyBoardMonitor::RotateQuaternionByYawPitchRoll(const HmdQuaternion_t quaternion_origin,double yaw_degree,double pitch_degree,double roll_degree){

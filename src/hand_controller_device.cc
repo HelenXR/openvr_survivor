@@ -114,19 +114,49 @@ void *CHandControllerDevice::GetComponent( const char *pchComponentNameAndVersio
 void CHandControllerDevice::DebugRequest( const char *pchRequest, char *pchResponseBuffer, uint32_t unResponseBufferSize ){
 
 }
-DriverPose_t CHandControllerDevice::GetPose(){
 
+DriverPose_t CHandControllerDevice::GetPose(){
+	double own_position[3];
 	//get controller pose.
 #if defined(CONTROLLER_ROTATE_BY_KEYBOARD)
 	m_Pose.qRotation = m_pKeyBoardMonitor->GetControllerPose(m_eHandController).qRotation;
 #endif
 
 #if defined(CONTROLLER_POSITION_BY_KEYBOARD)
-	m_Pose.vecPosition[0] = m_pKeyBoardMonitor->GetControllerPose(m_eHandController).vecPosition[0];
-	m_Pose.vecPosition[1] = m_pKeyBoardMonitor->GetControllerPose(m_eHandController).vecPosition[1];
-	m_Pose.vecPosition[2] = m_pKeyBoardMonitor->GetControllerPose(m_eHandController).vecPosition[2];
+	own_position[0] = m_pKeyBoardMonitor->GetControllerPose(m_eHandController).vecPosition[0];
+	own_position[1] = m_pKeyBoardMonitor->GetControllerPose(m_eHandController).vecPosition[1];
+	own_position[2] = m_pKeyBoardMonitor->GetControllerPose(m_eHandController).vecPosition[2];
 #endif
 	//before report,must adapte to HMD!
+	DriverPose_t hmd_pose = m_pKeyBoardMonitor->GetHMDPose();
+	m_Pose.qRotation = glm_adapter::QuaternionMultiplyQuaternion(hmd_pose.qRotation,m_Pose.qRotation);
+
+	//hand position = hmd_position + default_relative_position + own_position
+	m_Pose.vecPosition[0] = hmd_pose.vecPosition[0];
+	m_Pose.vecPosition[1] = hmd_pose.vecPosition[1];
+	m_Pose.vecPosition[2] = hmd_pose.vecPosition[2];
+	double left_hand_default_relative_position[3] =  { -HAND_CONTROLLER_RELATIVE_HMD_POSITION_X,-HAND_CONTROLLER_RELATIVE_HMD_POSITION_Y,-HAND_CONTROLLER_RELATIVE_HMD_POSITION_Z };
+	double right_hand_default_relative_position[3] = {  HAND_CONTROLLER_RELATIVE_HMD_POSITION_X,-HAND_CONTROLLER_RELATIVE_HMD_POSITION_Y,-HAND_CONTROLLER_RELATIVE_HMD_POSITION_Z };
+	switch(m_eHandController){
+		case LEFT_HAND_CONTROLLER:
+			glm_adapter::QuaternionMultiplyDouble3(hmd_pose.qRotation, left_hand_default_relative_position,left_hand_default_relative_position);
+			m_Pose.vecPosition[0] += left_hand_default_relative_position[0];
+			m_Pose.vecPosition[1] += left_hand_default_relative_position[1];
+			m_Pose.vecPosition[2] += left_hand_default_relative_position[2];		
+			break;
+		case RIGHT_HAND_CONTROLLER:			
+			glm_adapter::QuaternionMultiplyDouble3(hmd_pose.qRotation, right_hand_default_relative_position,right_hand_default_relative_position);
+			m_Pose.vecPosition[0] += right_hand_default_relative_position[0];
+			m_Pose.vecPosition[1] += right_hand_default_relative_position[1];
+			m_Pose.vecPosition[2] += right_hand_default_relative_position[2];		
+			break;
+	}	
+
+	glm_adapter::QuaternionMultiplyDouble3(hmd_pose.qRotation, own_position,own_position);
+	m_Pose.vecPosition[0] += own_position[0];
+	m_Pose.vecPosition[1] += own_position[1];
+	m_Pose.vecPosition[2] += own_position[2];
+
 	return m_Pose;
 }
 
@@ -166,7 +196,7 @@ void CHandControllerDevice::ReportPoseButtonThread(){
 
 		//update button state
 		GetButtonState(m_pKeyBoardMonitor->GetControllerButtonState(m_eHandController));
-		LOG_EVERY_N(INFO,60*10) << "controller pose button loop!" ;
+		//LOG_EVERY_N(INFO,60*10) << "controller pose button loop!" ;
 		pollDeadline += retryInterval;
 		std::this_thread::sleep_until( pollDeadline );
 	}

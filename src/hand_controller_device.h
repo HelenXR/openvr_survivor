@@ -5,7 +5,6 @@
 #include <thread>
 #include "keyboard_monitor.h"
 
-
 typedef void (vr::IVRServerDriverHost::*ButtonUpdate)(uint32_t unWhichDevice, vr::EVRButtonId eButtonId, double eventTimeOffset);
 class CHandControllerDevice : public ITrackedDeviceServerDriver,public IVRControllerComponent{
 public:

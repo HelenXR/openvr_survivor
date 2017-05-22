@@ -224,7 +224,7 @@ void CHeadMountDisplayDevice::ReportPoseThread(){
 		{
 			vr::VRServerDriverHost()->TrackedDevicePoseUpdated( m_unObjectId, GetPose(), sizeof( DriverPose_t ) );
 		}
-		LOG_EVERY_N(INFO,60*10) << "pose loop!" ;
+//		LOG_EVERY_N(INFO,60*10) << "pose loop!" ;
 		
 		FlushLogFiles(GLOG_INFO);
 		pollDeadline += retryInterval;

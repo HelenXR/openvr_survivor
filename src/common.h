@@ -10,6 +10,8 @@
 #include <thread>
 #include <chrono>
 #include "function_configure.h"
+#include "glm.hpp"
+#include "glm_adapter.h"
 
 //namespace
 using namespace std;
