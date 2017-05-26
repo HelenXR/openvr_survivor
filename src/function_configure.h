@@ -1,3 +1,13 @@
+/** @file 
+	@brief configure some function.
+
+	@date 2017.05.25
+	@author helenxr(helenhololens@gmail.com)
+	
+	if you want,you can use this in everywhere.
+	if you want to contribute to this project,join us.
+*/
+
 #ifndef OPENVR_SURVIVOR_SRC_FUNCTION_CONFIGURE_H_
 #define OPENVR_SURVIVOR_SRC_FUNCTION_CONFIGURE_H_
 

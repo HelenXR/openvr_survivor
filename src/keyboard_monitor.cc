@@ -99,31 +99,31 @@ void KeyBoardMonitor::KeyBoardForHMDPoseUpdate(){
 #if defined(HMD_ROTATE_BY_KEYBOARD)
 #define KEYBOARD_FOR_HMD_ROTATE_STEP_DEGREE                  10
 	if (KBC(VK_KEY_A)) {
-		m_sHMDPose.qRotation = RotateQuaternionByYawPitchRoll(m_sHMDPose.qRotation, KEYBOARD_FOR_HMD_ROTATE_STEP_DEGREE,0,0);
+		m_sHMDPose.qRotation = glm_adapter::RotateQuaternionByYawPitchRoll(m_sHMDPose.qRotation, KEYBOARD_FOR_HMD_ROTATE_STEP_DEGREE,0,0);
 		LOG(INFO) << "A Click!" << endl;
 	}
 	if (KBC(VK_KEY_D)) {
-		m_sHMDPose.qRotation = RotateQuaternionByYawPitchRoll(m_sHMDPose.qRotation,-KEYBOARD_FOR_HMD_ROTATE_STEP_DEGREE,0,0);
+		m_sHMDPose.qRotation = glm_adapter::RotateQuaternionByYawPitchRoll(m_sHMDPose.qRotation,-KEYBOARD_FOR_HMD_ROTATE_STEP_DEGREE,0,0);
 		LOG(INFO) << "D Click!" << endl;
 	}
 	if (KBC(VK_KEY_W)) {
-		m_sHMDPose.qRotation = RotateQuaternionByYawPitchRoll(m_sHMDPose.qRotation,0, KEYBOARD_FOR_HMD_ROTATE_STEP_DEGREE,0);
+		m_sHMDPose.qRotation = glm_adapter::RotateQuaternionByYawPitchRoll(m_sHMDPose.qRotation,0, KEYBOARD_FOR_HMD_ROTATE_STEP_DEGREE,0);
 		LOG(INFO) << "W Click!" << endl;
 	}
 	if (KBC(VK_KEY_X)) {
-		m_sHMDPose.qRotation = RotateQuaternionByYawPitchRoll(m_sHMDPose.qRotation,0,-KEYBOARD_FOR_HMD_ROTATE_STEP_DEGREE,0);
+		m_sHMDPose.qRotation = glm_adapter::RotateQuaternionByYawPitchRoll(m_sHMDPose.qRotation,0,-KEYBOARD_FOR_HMD_ROTATE_STEP_DEGREE,0);
 		LOG(INFO) << "X Click!" << endl;
 	}
 	if (KBC(VK_KEY_S)) {
-		m_sHMDPose.qRotation = RotateQuaternionByYawPitchRoll(m_sHMDPose.qRotation, 0, -KEYBOARD_FOR_HMD_ROTATE_STEP_DEGREE, 0);
+		m_sHMDPose.qRotation = glm_adapter::RotateQuaternionByYawPitchRoll(m_sHMDPose.qRotation, 0, -KEYBOARD_FOR_HMD_ROTATE_STEP_DEGREE, 0);
 		LOG(INFO) << "S Click!" << endl;
 	}
 	if (KBC(VK_KEY_Q)) {
-		m_sHMDPose.qRotation = RotateQuaternionByYawPitchRoll(m_sHMDPose.qRotation,0,0, KEYBOARD_FOR_HMD_ROTATE_STEP_DEGREE);
+		m_sHMDPose.qRotation = glm_adapter::RotateQuaternionByYawPitchRoll(m_sHMDPose.qRotation,0,0, KEYBOARD_FOR_HMD_ROTATE_STEP_DEGREE);
 		LOG(INFO) << "Q Click!" << endl;
 	}
 	if (KBC(VK_KEY_E)) {
-		m_sHMDPose.qRotation = RotateQuaternionByYawPitchRoll(m_sHMDPose.qRotation,0,0,-KEYBOARD_FOR_HMD_ROTATE_STEP_DEGREE);
+		m_sHMDPose.qRotation = glm_adapter::RotateQuaternionByYawPitchRoll(m_sHMDPose.qRotation,0,0,-KEYBOARD_FOR_HMD_ROTATE_STEP_DEGREE);
 		LOG(INFO) << "E Click!" << endl;
 	}
 	if (KBC(VK_KEY_C)) {
@@ -216,31 +216,31 @@ void KeyBoardMonitor::KeyBoardForControllerPoseAndButtonUpdate() {
 #if defined(CONTROLLER_ROTATE_BY_KEYBOARD)
 #define KEYBOARD_FOR_CONTROLLER_ROTATE_STEP_DEGREE                  10
 	if (KBC(VK_KEY_J)) {
-		m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation = RotateQuaternionByYawPitchRoll(m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation, KEYBOARD_FOR_CONTROLLER_ROTATE_STEP_DEGREE, 0, 0);
+		m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation = glm_adapter::RotateQuaternionByYawPitchRoll(m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation, KEYBOARD_FOR_CONTROLLER_ROTATE_STEP_DEGREE, 0, 0);
 		LOG(INFO) << "J Click!" << endl;
 	}
 	if (KBC(VK_KEY_L)) {
-		m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation = RotateQuaternionByYawPitchRoll(m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation, -KEYBOARD_FOR_CONTROLLER_ROTATE_STEP_DEGREE, 0, 0);
+		m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation = glm_adapter::RotateQuaternionByYawPitchRoll(m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation, -KEYBOARD_FOR_CONTROLLER_ROTATE_STEP_DEGREE, 0, 0);
 		LOG(INFO) << "L Click!" << endl;
 	}
 	if (KBC(VK_KEY_I)) {
-		m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation = RotateQuaternionByYawPitchRoll(m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation, 0, KEYBOARD_FOR_CONTROLLER_ROTATE_STEP_DEGREE, 0);
+		m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation = glm_adapter::RotateQuaternionByYawPitchRoll(m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation, 0, KEYBOARD_FOR_CONTROLLER_ROTATE_STEP_DEGREE, 0);
 		LOG(INFO) << "I Click!" << endl;
 	}
 	if (KBC(VK_KEY_K)) {
-		m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation = RotateQuaternionByYawPitchRoll(m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation, 0, -KEYBOARD_FOR_CONTROLLER_ROTATE_STEP_DEGREE, 0);
+		m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation = glm_adapter::RotateQuaternionByYawPitchRoll(m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation, 0, -KEYBOARD_FOR_CONTROLLER_ROTATE_STEP_DEGREE, 0);
 		LOG(INFO) << "K Click!" << endl;
 	}
 	if (KBC(VK_OEM_COMMA)) {
-		m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation = RotateQuaternionByYawPitchRoll(m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation, 0, -KEYBOARD_FOR_CONTROLLER_ROTATE_STEP_DEGREE, 0);
+		m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation = glm_adapter::RotateQuaternionByYawPitchRoll(m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation, 0, -KEYBOARD_FOR_CONTROLLER_ROTATE_STEP_DEGREE, 0);
 		LOG(INFO) << ", Click!" << endl;
 	}
 	if (KBC(VK_KEY_U)) {
-		m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation = RotateQuaternionByYawPitchRoll(m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation, 0, 0, KEYBOARD_FOR_CONTROLLER_ROTATE_STEP_DEGREE);
+		m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation = glm_adapter::RotateQuaternionByYawPitchRoll(m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation, 0, 0, KEYBOARD_FOR_CONTROLLER_ROTATE_STEP_DEGREE);
 		LOG(INFO) << "U Click!" << endl;
 	}
 	if (KBC(VK_KEY_O)) {
-		m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation = RotateQuaternionByYawPitchRoll(m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation, 0, 0, -KEYBOARD_FOR_CONTROLLER_ROTATE_STEP_DEGREE);
+		m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation = glm_adapter::RotateQuaternionByYawPitchRoll(m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation, 0, 0, -KEYBOARD_FOR_CONTROLLER_ROTATE_STEP_DEGREE);
 		LOG(INFO) << "O Click!" << endl;
 	}
 	if (KBC(VK_OEM_PERIOD)) {
@@ -362,41 +362,4 @@ void KeyBoardMonitor::KeyBoardForControllerPoseAndButtonUpdate() {
 	//left hand pose update as-is right hand
 	
 }
-//yaw range:-90~90 pitch range:-180~180 roll range:-180~180.
-HmdQuaternion_t KeyBoardMonitor::RotateQuaternionByYawPitchRoll(const HmdQuaternion_t quaternion_origin,double yaw_degree,double pitch_degree,double roll_degree){
-	HmdQuaternion_t quaternion_dest = {0};
-#if 0
-	//convert quat to euler angle in degree.
-	auto euler = degrees(eulerAngles(glm::quat((float)quaternion_origin.w,(float)quaternion_origin.x,(float)quaternion_origin.y,(float)quaternion_origin.z)));
-	LOG(INFO) << "RotateQuaternionByYawPitchRoll:before euler(" << euler.x << "," << euler.y << "," << euler.z << ")";
-	//add euler angle,pitch as x, yaw as y, roll as z.
-	euler.x += (float)pitch_degree;
-	euler.y += (float)yaw_degree;
-	euler.z += (float)roll_degree;
-	LOG(INFO) << "RotateQuaternionByYawPitchRoll:after euler(" << euler.x << "," << euler.y << "," << euler.z << ")";
-	//convert euler angle in degree to quat.
-	glm::quat quat = glm::quat{radians(euler)};
-	quaternion_dest.x = quat.x;
-	quaternion_dest.y = quat.y;
-	quaternion_dest.z = quat.z;
-	quaternion_dest.w = quat.w;
-#else
-	glm::quat quat_origin = glm::quat((float)quaternion_origin.w, (float)quaternion_origin.x, (float)quaternion_origin.y, (float)quaternion_origin.z);
-	auto euler = degrees(eulerAngles(quat_origin));
-	LOG(INFO) << "RotateQuaternionByYawPitchRoll:before eulerPYR(" << euler.x << "," << euler.y << "," << euler.z << ")";	
-	glm::quat quat_dest;
-	if(yaw_degree != 0)
-		quat_dest = glm::rotate(quat_origin,glm::radians((float)yaw_degree),glm::vec3(0.f,1.f,0.f));
-	else if (pitch_degree != 0)
-		quat_dest = glm::rotate(quat_origin, glm::radians((float)pitch_degree), glm::vec3(1.f, 0.f, 0.f));
-	else if (roll_degree != 0)
-		quat_dest = glm::rotate(quat_origin, glm::radians((float)roll_degree), glm::vec3(0.f, 0.f, 1.f));
-	euler = degrees(eulerAngles(quat_dest));
-	LOG(INFO) << "RotateQuaternionByYawPitchRoll:after eulerPYR(" << euler.x << "," << euler.y << "," << euler.z << ")";	
-	quaternion_dest.x = quat_dest.x;
-	quaternion_dest.y = quat_dest.y;
-	quaternion_dest.z = quat_dest.z;
-	quaternion_dest.w = quat_dest.w;
-#endif	
-	return quaternion_dest;
-}
+

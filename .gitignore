@@ -1,5 +1,7 @@
 #ignore build files
 build
+#ignore doxygen generate files
+doxygen_docs
 
 #ignore *.bak *.swp
 *.bak

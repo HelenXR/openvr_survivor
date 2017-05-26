@@ -1,3 +1,13 @@
+/** @file 
+	@brief project common head file
+
+	@date 2017.05.25
+	@author helenxr(helenhololens@gmail.com)
+	
+	if you want,you can use this in everywhere.
+	if you want to contribute to this project,join us.
+*/
+
 #ifndef OPENVR_SURVIVOR_SRC_COMMON_H_
 #define OPENVR_SURVIVOR_SRC_COMMON_H_
 #include <iostream>
