@@ -115,6 +115,11 @@ private:
 	
 	std::thread m_tReportPoseThread;	//<thread	
 	bool m_bReportPoseThreadState;      //<false:stop true:running.
+
+	float m_fDistortionK1;				//<barrel distort parameter K1
+	float m_fDistortionK2;				//<barrel distort parameter K2
+	float m_fZoomWidth;					//<width zoom scale 
+	float m_fZoomHeight;				//<height zoom scale	
 #if defined(HMD_ROTATE_BY_KEYBOARD) || defined(HMD_POSITION_BY_KEYBOARD)
 	KeyBoardMonitor *m_pKeyBoardMonitor;//< pointer to keyboard monitor.
 #endif	

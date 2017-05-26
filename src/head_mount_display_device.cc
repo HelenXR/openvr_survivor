@@ -24,6 +24,10 @@ CHeadMountDisplayDevice::CHeadMountDisplayDevice(){
 	m_flSecondsFromVsyncToPhotons = vr::VRSettings()->GetFloat( k_pch_Sample_Section, k_pch_Sample_SecondsFromVsyncToPhotons_Float );
 	m_flDisplayFrequency = vr::VRSettings()->GetFloat( k_pch_Sample_Section, k_pch_Sample_DisplayFrequency_Float );
 
+	m_fDistortionK1 = 0.91f;
+	m_fDistortionK2 = 0.93f;
+	m_fZoomWidth = 0.8f;
+	m_fZoomHeight = 0.8f;
 	LOG(INFO) << "CHeadMountDisplayDevice: Serial Number:" << m_sSerialNumber.c_str();
 	LOG(INFO) << "CHeadMountDisplayDevice: Model Number:" << m_sModelNumber.c_str() ;
 	LOG(INFO) << "CHeadMountDisplayDevice: Window:" << m_nWindowX << "," << m_nWindowY << "," << m_nWindowWidth << "," << m_nWindowHeight ;
@@ -200,12 +204,28 @@ void CHeadMountDisplayDevice::GetProjectionRaw( EVREye eEye, float *pfLeft, floa
 DistortionCoordinates_t CHeadMountDisplayDevice::ComputeDistortion( EVREye eEye, float fU, float fV ) 
 {
 	DistortionCoordinates_t coordinates;
-	coordinates.rfBlue[0] = fU;
-	coordinates.rfBlue[1] = fV;
-	coordinates.rfGreen[0] = fU;
-	coordinates.rfGreen[1] = fV;
-	coordinates.rfRed[0] = fU;
-	coordinates.rfRed[1] = fV;
+	//add distortion for lens
+	float hX;
+	float hY;
+	double rr;
+	double r2;
+	double theta;	
+
+	//The formula is derived from this video:https://www.youtube.com/watch?v=B7qrgrrHry0&feature=youtu.be
+    //and Distortion correction algorithm for Wikipedia:https://en.wikipedia.org/wiki/Distortion_(optics)#Software_correction
+	rr = sqrt((fU - 0.5f)*(fU - 0.5f) + (fV - 0.5f)*(fV - 0.5f));
+	r2 = rr * (1 + m_fDistortionK1*(rr*rr) + m_fDistortionK2*(rr*rr*rr*rr));
+	theta = atan2(fU-0.5f, fV-0.5f);
+	hX = sin(theta)*r2*m_fZoomWidth;
+	hY = cos(theta)*r2*m_fZoomHeight;
+	
+	coordinates.rfBlue[0] = hX + 0.5f;
+	coordinates.rfBlue[1] = hY + 0.5f;
+	coordinates.rfGreen[0] = hX + 0.5f;
+	coordinates.rfGreen[1] = hY + 0.5f;
+	coordinates.rfRed[0] = hX + 0.5f;
+	coordinates.rfRed[1] = hY + 0.5f;
+
 	return coordinates;
 }
 
