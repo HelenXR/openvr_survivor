@@ -44,7 +44,7 @@ const char * const *CServerProvider::GetInterfaceVersions(){
 }
 
 void CServerProvider::RunFrame(){
-
+	KeyBoardDebugFunction();
 }
 
 bool CServerProvider::ShouldBlockStandbyMode(){
@@ -58,3 +58,26 @@ void CServerProvider::EnterStandby(){
 void CServerProvider::LeaveStandby(){
 
 }
+
+//Circle 10ms
+void CServerProvider::KeyBoardDebugFunction(){
+	static int loop_cnt = 0;
+	static bool key_board_debug = false;
+	if(loop_cnt++ < 9)//period:10*10ms
+		return;
+	loop_cnt = 0;
+	if(KBC(VK_RCONTROL) && (KBC(VK_LCONTROL))){
+		key_board_debug = !key_board_debug;
+		LOG(INFO) << "key_board_debug:" << key_board_debug; 
+	}
+	if(key_board_debug){
+		if(KBC(VK_KEY_1)){
+			m_pHeadMountDisplay->RecenterHMD();
+		}	
+		if(KBC(VK_KEY_2)){
+			m_pHeadMountDisplay->SetForwardDirectionInYaw(simple_math::GetYawDegree(m_pHeadMountDisplay->GetMemberPose().qRotation));
+		}	
+	}
+
+}
+

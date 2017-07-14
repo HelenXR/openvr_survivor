@@ -96,6 +96,49 @@ public:
 		Thread: update HMD pose.
 	*/
 	void CHeadMountDisplayDevice::ReportPoseThread();
+	/**
+		SetForwardDirectionInYaw;
+	*/
+	void SetForwardDirectionInYaw(const double forward_yaw_offset);
+	/**
+		RecenterHMD
+	*/
+	void RecenterHMD();
+	/**
+		get yaw offset in degree.
+		@param[in] quaternion.
+		@return yaw offset(unit:degree).
+		note:The frequency that this function is called is consistent with the reporting frequency. By inline, 
+		you can reduce the time you put in and out of the stack.
+	*/
+	inline vr::HmdQuaternion_t DoOrientationRecenter(const vr::HmdQuaternion_t quaternion_origin,const double yaw_offset){
+		double yaw_degree_new,yaw_degree_origin;
+		vr::HmdVector3d_t degree;
+		vr::HmdQuaternion_t quaternion_dest;
+		//get origin yaw from quaternion
+		degree = simple_math::QuaternionToEulerDegree(quaternion_origin);
+		yaw_degree_origin = degree.v[0];
+		LOG_EVERY_N(INFO,5 * 60) << "DoOrientationRecenter[0]:quat(" << quaternion_origin.w << "," << quaternion_origin.x << ","
+			<< quaternion_origin.y << "," << quaternion_origin.z << "),degree(" << degree.v[0] << "," << degree.v[1] << ","
+			<< degree.v[2] << "),yaw_offset=" << yaw_offset;
+		
+		//recenter yaw ,get yaw_degree_new
+		yaw_degree_new = yaw_degree_origin - yaw_offset;
+		if(yaw_degree_new > 180){
+			yaw_degree_new= -360 + yaw_degree_new;
+		}else if(yaw_degree_new < -180){
+			yaw_degree_new = 360 + yaw_degree_new;
+		}
+		//transform degree to quaternion
+		degree.v[0] = yaw_degree_new;
+		quaternion_dest = simple_math::DegreeEulerToQuaternion(degree);
+		
+		LOG_EVERY_N(INFO,5 * 60) << "DoOrientationRecenter[1]:quat(" << quaternion_dest.w << "," << quaternion_dest.x << ","
+			<< quaternion_dest.y << "," << quaternion_dest.z << "),degree(" << degree.v[0] << "," << degree.v[1] << ","
+			<< degree.v[2] << "),yaw_offset=" << yaw_offset;
+		return quaternion_dest;
+	}
+	vr::DriverPose_t CHeadMountDisplayDevice::GetMemberPose();	
 private:
 	vr::TrackedDeviceIndex_t m_unObjectId;//< unique id ,set by vrserver through Activate function
 	vr::PropertyContainerHandle_t m_ulPropertyContainer;//< use to set/get property
@@ -123,5 +166,9 @@ private:
 #if defined(HMD_ROTATE_BY_KEYBOARD) || defined(HMD_POSITION_BY_KEYBOARD)
 	KeyBoardMonitor *m_pKeyBoardMonitor;//< pointer to keyboard monitor.
 #endif	
+	double m_dRecenterYawOffset;		//recenter Yaw unit:degree
+	double m_dForwardDirectionInYaw;	//<Forward direction in yaw unit:degree
+	vr::HmdQuaternion_t m_OriginRotation; //< Orientation of the tracker rotation.
+	vr::DriverPose_t m_Pose;			//HMD pose.
 };
 #endif

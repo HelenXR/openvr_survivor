@@ -57,6 +57,10 @@ public:
 	/** Called when the system is leaving Standby mode. The driver should switch itself back to
 	full operation. */
 	virtual void LeaveStandby() override;
+	/**
+		debug by keyboard.
+	*/
+	void CServerProvider::KeyBoardDebugFunction();
 private:
 	
 	CHeadMountDisplayDevice *m_pHeadMountDisplay;///< pointer to HMD

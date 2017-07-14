@@ -41,11 +41,11 @@ KeyBoardMonitor::~KeyBoardMonitor(){
 	m_bDetectKeyBoardThreadState = false;
 }
 
-DriverPose_t KeyBoardMonitor::GetHMDPose(){
+vr::DriverPose_t KeyBoardMonitor::GetHMDPose(){
 	return m_sHMDPose;
 }
 
-DriverPose_t KeyBoardMonitor::GetControllerPose(EHandController hand_controller) {
+vr::DriverPose_t KeyBoardMonitor::GetControllerPose(EHandController hand_controller) {
 	LOG_IF(ERROR, hand_controller >= HAND_CONTROLLER_COUNT);
 	return m_sControllerPose[hand_controller];
 }

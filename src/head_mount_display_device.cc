@@ -28,6 +28,20 @@ CHeadMountDisplayDevice::CHeadMountDisplayDevice(){
 	m_fDistortionK2 = 0.93f;
 	m_fZoomWidth = 0.8f;
 	m_fZoomHeight = 0.8f;
+	m_dRecenterYawOffset = 0.0;
+	m_dForwardDirectionInYaw = 0.0;
+	//init m_pose struct
+	memset( &m_Pose, 0, sizeof( m_Pose ) );
+	m_Pose.willDriftInYaw = true;
+	m_Pose.shouldApplyHeadModel = false;
+	m_Pose.deviceIsConnected = true;
+	m_Pose.poseIsValid = true;
+	m_Pose.result = vr::ETrackingResult::TrackingResult_Running_OK;
+	m_Pose.qRotation = HmdQuaternion_Init( 1, 0, 0, 0 );
+	m_Pose.qWorldFromDriverRotation = HmdQuaternion_Init( 1, 0, 0, 0 );
+	m_Pose.qDriverFromHeadRotation = HmdQuaternion_Init( 1,0, 0, 0);
+	m_Pose.poseTimeOffset = -0.002f;
+	
 	LOG(INFO) << "CHeadMountDisplayDevice: Serial Number:" << m_sSerialNumber.c_str();
 	LOG(INFO) << "CHeadMountDisplayDevice: Model Number:" << m_sModelNumber.c_str() ;
 	LOG(INFO) << "CHeadMountDisplayDevice: Window:" << m_nWindowX << "," << m_nWindowY << "," << m_nWindowWidth << "," << m_nWindowHeight ;
@@ -133,24 +147,20 @@ void CHeadMountDisplayDevice::DebugRequest(const char *pchRequest,char *pchRespo
 }
 
 DriverPose_t CHeadMountDisplayDevice::GetPose(){
-	DriverPose_t pose = { 0 };
-	pose.poseIsValid = true;
-	pose.result = TrackingResult_Running_OK;
-	pose.deviceIsConnected = true;
-
-	pose.qWorldFromDriverRotation = HmdQuaternion_Init( 1, 0, 0, 0 );
-	pose.qDriverFromHeadRotation = HmdQuaternion_Init( 1, 0, 0, 0 );
 	
 #if defined(HMD_ROTATE_BY_KEYBOARD)
-    pose.qRotation = m_pKeyBoardMonitor->GetHMDPose().qRotation;
+    m_Pose.qRotation = m_pKeyBoardMonitor->GetHMDPose().qRotation;
 #endif
 
 #if defined(HMD_POSITION_BY_KEYBOARD)
-	pose.vecPosition[0] = m_pKeyBoardMonitor->GetHMDPose().vecPosition[0];
-	pose.vecPosition[1] = m_pKeyBoardMonitor->GetHMDPose().vecPosition[1];
-	pose.vecPosition[2] = m_pKeyBoardMonitor->GetHMDPose().vecPosition[2];
+	m_Pose.vecPosition[0] = m_pKeyBoardMonitor->GetHMDPose().vecPosition[0];
+	m_Pose.vecPosition[1] = m_pKeyBoardMonitor->GetHMDPose().vecPosition[1];
+	m_Pose.vecPosition[2] = m_pKeyBoardMonitor->GetHMDPose().vecPosition[2];
 #endif
-	return pose;
+	m_OriginRotation = m_Pose.qRotation;
+	if(abs(m_dRecenterYawOffset) > EPSILON)
+		m_Pose.qRotation = DoOrientationRecenter(m_Pose.qRotation,m_dRecenterYawOffset);
+	return m_Pose;
 }
 
 void CHeadMountDisplayDevice::GetWindowBounds( int32_t *pnX, int32_t *pnY, uint32_t *pnWidth, uint32_t *pnHeight ) 
@@ -251,6 +261,22 @@ void CHeadMountDisplayDevice::ReportPoseThread(){
 		std::this_thread::sleep_until( pollDeadline );
 	}
 	LOG(INFO) << "ReportPoseThread:exit!" ;
+}
+/**
+	SetForwardDirectionInYaw;
+*/
+void CHeadMountDisplayDevice::SetForwardDirectionInYaw(const double forward_yaw_offset){
+	m_dForwardDirectionInYaw = forward_yaw_offset;
+}
+/**
+	RecenterHMD
+*/
+void CHeadMountDisplayDevice::RecenterHMD(){
+	m_dRecenterYawOffset = simple_math::GetYawDegree(m_OriginRotation) - m_dForwardDirectionInYaw;
+	LOG(INFO) << "Get m_dRecenterYawOffset=" << m_dRecenterYawOffset << ",m_dForwardDirectionInYaw=" <<m_dForwardDirectionInYaw; 
+}
+vr::DriverPose_t CHeadMountDisplayDevice::GetMemberPose(){
+	return m_Pose;
 }
 
 
