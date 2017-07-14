@@ -22,6 +22,7 @@
 #include "function_configure.h"
 #include "glm.hpp"
 #include "glm_adapter.h"
+#include "simple_math.h"
 
 //namespace
 using namespace std;
