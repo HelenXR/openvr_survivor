@@ -60,11 +60,47 @@ public:
 	/**
 		debug by keyboard.
 	*/
-	void CServerProvider::KeyBoardDebugFunction();
+	void KeyBoardDebugFunction();
+	/**
+		init six dof module sdk.
+	*/
+	void SixDofTrackingModuleInit();
+	/**
+		set six dof module  e.g:nolo ximmerse.
+	*/
+	void SetSixDofModuleType(ESixDofTrackingModule six_dof_module);
+	/**
+		MultiLightWeightFunctionThread.
+		handle light weight function, e.g keyboard debug,glog log flush ,six dof detect etc.
+	*/
+	void MultiLightWeightFunctionThread();	
+	/**
+		update six dof module state.
+	*/
+	void UpdateSixDofModuleState();
+	/**
+		update six dof module tracking data.
+	*/
+	void UpdateSixDofModuleTrackingData();	
+ 	/**
+		HandleTrackedDevicePostMessageThread.
+	*/
+	void HandleTrackedDevicePostMessageThread();	
 private:
 	
 	CHeadMountDisplayDevice *m_pHeadMountDisplay;///< pointer to HMD
 	CHandControllerDevice *m_pHandControllerDevice[HAND_CONTROLLER_COUNT];///< pointer to hand controllers
+#ifdef USE_XIMMERSE_SIX_DOF_TRACKING_MODULE
+	int m_nXimmerseHandle[XIMMERSE_DEVICE_MAX] = {-1,-1,-1,-1};	//< 0:XHawk-0  1:XCobra-0 2:XCobra-1 3:VRDevice
+#endif	
+	ESixDofTrackingModule m_eSixDofTrackingModule;				//< six dof tracking module type.
+	bool m_bMultiLightWeightFunctionThreadState;			//<false:stop true:running.
+	std::thread m_tMultiLightWeightFunctionThread; //< Multi Light Weight Function Thread.
+	bool m_bControllerState[HAND_CONTROLLER_COUNT];								//< true:controller is connect  false: controller is disconnect
+	std::thread m_tHandleTrackedDevicePostMessageThread;		//<handle all tracked devices' message;
+	bool m_bHandleTrackedDevicePostMessageThreadState;			//<false:stop true:running.
+	uint64_t m_uHandleTrackedDevicePostMessageThreadID;			//< HandleTrackedDevicePostMessageThread id;	
+
 };
 
 #endif

@@ -115,6 +115,25 @@ namespace simple_math{
 		return vector_degree.v[1];
 	}
 
+	void Matrix4x4_TRS(glm::mat4x4& dest,
+		float tx,float ty,float tz,
+		float rx,float ry,float rz,
+		float sx,float sy,float sz
+	){
+		// T
+		glm::mat4x4 T=glm::translate(glm::vec3(tx, ty, tz));
+		// R
+		glm::mat4x4 R=glm::yawPitchRoll(ry*kDeg2Rad,rx*kDeg2Rad,rz*kDeg2Rad);
+		// S
+		glm::mat4x4 S=glm::scale(glm::vec3(sx, sy, sz));
+		//
+		dest=T*R*S;
+	}
+	
+	void Matrix4x4_MultiplyMV(float* dest,glm::mat4x4& m,float* src){
+		glm::vec4 v=m*glm::vec4(src[vec3_x],src[vec3_y],src[vec3_z],1.0f);
+		v2f(dest,v);
+	}
 
 
 }

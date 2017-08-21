@@ -59,6 +59,13 @@ namespace glm_adapter{
 #endif	
 		return quaternion_dest;
 	}
-	
+	void PointAroundPointRotate(const vr::HmdQuaternion_t quaternion_rotate, const double point_origin[3], const double point_center[3], double point_dest[3]) {
+		glm::tquat<double> tquat_rotate(quaternion_rotate.w, quaternion_rotate.x, quaternion_rotate.y, quaternion_rotate.z);
+		glm::tvec3<double> tvec3_origin(point_origin[0], point_origin[1], point_origin[2]), tvec3_center(point_center[0], point_center[1], point_center[2]),tvec3_dest;
+		tvec3_dest = tquat_rotate * (tvec3_origin - tvec3_center) + tvec3_center;
+		point_dest[0] = tvec3_dest.x;
+		point_dest[1] = tvec3_dest.y;
+		point_dest[2] = tvec3_dest.z;
+	}		
 }
 

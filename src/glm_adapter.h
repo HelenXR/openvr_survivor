@@ -39,5 +39,13 @@ namespace glm_adapter{
 		@return  dest quaternion.
 	*/
 	vr::HmdQuaternion_t RotateQuaternionByYawPitchRoll(const vr::HmdQuaternion_t quaternion_origin,double yaw_degree,double pitch_degree,double roll_degree);	
+	/**
+		point around another point rotate.
+		@param[in] quaternion_rotate rotate angle;
+		@param[in] point_origin origin point
+		@param[in] point_center center point
+		@param[out] point_dest point_dest = quaternion_rotate * (point_origin - point_center) + point_center;
+	*/
+	void PointAroundPointRotate(const vr::HmdQuaternion_t quaternion_rotate, const double point_origin[3], const double point_center[3], double point_dest[3]);	
 }
 #endif

@@ -23,6 +23,9 @@ CHeadMountDisplayDevice::CHeadMountDisplayDevice(){
 	m_nRenderHeight = vr::VRSettings()->GetInt32( k_pch_Sample_Section, k_pch_Sample_RenderHeight_Int32 );
 	m_flSecondsFromVsyncToPhotons = vr::VRSettings()->GetFloat( k_pch_Sample_Section, k_pch_Sample_SecondsFromVsyncToPhotons_Float );
 	m_flDisplayFrequency = vr::VRSettings()->GetFloat( k_pch_Sample_Section, k_pch_Sample_DisplayFrequency_Float );
+	m_fHmdXPositionOffset = vr::VRSettings()->GetFloat( k_pch_Sample_Section, k_pch_Sample_HmdXPositionOffset_Float );
+	m_fHmdYPositionOffset = vr::VRSettings()->GetFloat( k_pch_Sample_Section, k_pch_Sample_HmdYPositionOffset_Float );
+	m_fHmdZPositionOffset = vr::VRSettings()->GetFloat( k_pch_Sample_Section, k_pch_Sample_HmdZPositionOffset_Float );
 
 	m_fDistortionK1 = 0.91f;
 	m_fDistortionK2 = 0.93f;
@@ -30,6 +33,8 @@ CHeadMountDisplayDevice::CHeadMountDisplayDevice(){
 	m_fZoomHeight = 0.8f;
 	m_dRecenterYawOffset = 0.0;
 	m_dForwardDirectionInYaw = 0.0;
+	m_bTrunAround = false;
+	
 	//init m_pose struct
 	memset( &m_Pose, 0, sizeof( m_Pose ) );
 	m_Pose.willDriftInYaw = true;
@@ -41,6 +46,7 @@ CHeadMountDisplayDevice::CHeadMountDisplayDevice(){
 	m_Pose.qWorldFromDriverRotation = HmdQuaternion_Init( 1, 0, 0, 0 );
 	m_Pose.qDriverFromHeadRotation = HmdQuaternion_Init( 1,0, 0, 0);
 	m_Pose.poseTimeOffset = -0.002f;
+	m_eSixModuleType = NONE_SIX_DOF_TRACKING_MODULE;
 	
 	LOG(INFO) << "CHeadMountDisplayDevice: Serial Number:" << m_sSerialNumber.c_str();
 	LOG(INFO) << "CHeadMountDisplayDevice: Model Number:" << m_sModelNumber.c_str() ;
@@ -49,7 +55,7 @@ CHeadMountDisplayDevice::CHeadMountDisplayDevice(){
 	LOG(INFO) << "CHeadMountDisplayDevice: Seconds from Vsync to Photons:" << m_flSecondsFromVsyncToPhotons;
 	LOG(INFO) << "CHeadMountDisplayDevice: Display Frequency:" << m_flDisplayFrequency;
 	LOG(INFO) << "CHeadMountDisplayDevice: IPD:" << m_flIPD;
-	
+	LOG(INFO) << "hmd_offset(" << m_fHmdXPositionOffset << "," << m_fHmdYPositionOffset << "," << m_fHmdZPositionOffset << ").";
 	
 	//create report hmd pose thread
 	m_tReportPoseThread = std::thread(&CHeadMountDisplayDevice::ReportPoseThread ,this);
@@ -158,8 +164,18 @@ DriverPose_t CHeadMountDisplayDevice::GetPose(){
 	m_Pose.vecPosition[2] = m_pKeyBoardMonitor->GetHMDPose().vecPosition[2];
 #endif
 	m_OriginRotation = m_Pose.qRotation;
-	if(abs(m_dRecenterYawOffset) > EPSILON)
+	if(abs(m_dRecenterYawOffset) > EPSILON){
 		m_Pose.qRotation = DoOrientationRecenter(m_Pose.qRotation,m_dRecenterYawOffset);
+	}
+
+	if(m_bTrunAround){
+		vr::HmdQuaternion_t quaternion_rotate = HmdQuaternion_Init( 0, 0, 1, 0 );
+		vr::HmdQuaternion_t quaternion_origin = HmdQuaternion_Init( m_Pose.qRotation.w,m_Pose.qRotation.x,m_Pose.qRotation.y,m_Pose.qRotation.z);
+		m_Pose.qRotation = glm_adapter::QuaternionMultiplyQuaternion(quaternion_rotate,m_Pose.qRotation);
+		VLOG_EVERY_N(1,5*500) << "head trun around pose:origin_YPR(" << simple_math::GetYawDegree(quaternion_origin) << "," << simple_math::GetPitchDegree(quaternion_origin) << "," << simple_math::GetRollDegree(quaternion_origin)
+						<< "),rotate_YPR("  << simple_math::GetYawDegree(quaternion_rotate) << "," << simple_math::GetPitchDegree(quaternion_rotate) << "," << simple_math::GetRollDegree(quaternion_rotate)
+						<< "),dest_YPR("  << simple_math::GetYawDegree(m_Pose.qRotation) << "," << simple_math::GetPitchDegree(m_Pose.qRotation) << "," << simple_math::GetRollDegree(m_Pose.qRotation);	
+	}	
 	return m_Pose;
 }
 
@@ -279,56 +295,48 @@ vr::DriverPose_t CHeadMountDisplayDevice::GetMemberPose(){
 	return m_Pose;
 }
 
+void CHeadMountDisplayDevice::SetSixDofModuleType(ESixDofTrackingModule six_dof_module){
+	m_eSixModuleType = six_dof_module;
+	LOG(INFO) << "set hmd six dof module = " << six_dof_module;
+}
+
+void CHeadMountDisplayDevice::SetSixDofData(void *six_dof_data){
+
+#ifdef USE_XIMMERSE_SIX_DOF_TRACKING_MODULE
+	if(m_eSixModuleType == XIMMERSE_SIX_DOF_TRACKING_MODULE){
+		float *hmdPos =reinterpret_cast<float *>(six_dof_data);
+		glm::mat4x4 modelMatrix;
+		simple_math::Matrix4x4_TRS(modelMatrix, 0.0f, 0.0f, -1.5f,
+			15.0f, 0.0f, 0.0f,
+			1.0f, 1.0f, 1.0f
+		);
+		simple_math::Matrix4x4_MultiplyMV(hmdPos, modelMatrix, hmdPos);
+
+		m_Pose.vecPosition[0] = hmdPos[0] + m_fHmdXPositionOffset;
+		m_Pose.vecPosition[1] = hmdPos[1] + m_fHmdYPositionOffset;
+		m_Pose.vecPosition[2] = hmdPos[2] + m_fHmdZPositionOffset;	
+	}
+#endif
+	if(m_eSixModuleType != NONE_SIX_DOF_TRACKING_MODULE){
+		if(m_bTrunAround){
+	        vr::HmdQuaternion_t quaternion_rotate = HmdQuaternion_Init( 0, 0, 1, 0 );
+            glm_adapter::PointAroundPointRotate(quaternion_rotate,m_Pose.vecPosition,m_dHmdPositionWhenTurnAround,m_Pose.vecPosition);			
+		}
+	}
+	LOG_EVERY_N(INFO,1*60) << "SetSixDofData(" << m_eSixModuleType <<"):hmd position(" << m_Pose.vecPosition[0] << "," << m_Pose.vecPosition[1] << "," << m_Pose.vecPosition[2] << ")";
+
+}
 
 
+void CHeadMountDisplayDevice::SetTurnAroundState(const bool new_state){
+	m_bTrunAround = new_state;
+	LOG(INFO) << "set turn around state:" << new_state;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void CHeadMountDisplayDevice::SetHmdPositionWhenTurnAround(const double hmd_position[3]){
+	m_dHmdPositionWhenTurnAround[0] = hmd_position[0];
+	m_dHmdPositionWhenTurnAround[1] = hmd_position[1];
+	m_dHmdPositionWhenTurnAround[2] = hmd_position[2];
+	LOG(INFO) << "SetHmdPositionWhenTurnAround:(" << m_dHmdPositionWhenTurnAround[0] << "," << m_dHmdPositionWhenTurnAround[1] << "," << m_dHmdPositionWhenTurnAround[2] << ").";
+}
 

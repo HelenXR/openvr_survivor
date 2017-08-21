@@ -10,6 +10,9 @@
       "renderWidth" : 1920,
       "renderHeight" : 1080,
       "secondsFromVsyncToPhotons" : 0.011,
-      "displayFrequency" : 0
+      "displayFrequency" : 62.0,
+	  "hmd_x_position_offset":0.0,
+	  "hmd_y_position_offset":1.5,
+	  "hmd_z_position_offset":0.0
    }
 }

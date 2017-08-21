@@ -31,6 +31,14 @@ using namespace google;
 
 //import lib
 #pragma comment(lib,"libglog.lib")
+#ifdef USE_XIMMERSE_SIX_DOF_TRACKING_MODULE
+#pragma comment(lib,"xdevice.lib")
+#include <xdevice.h>
+using namespace ximmerse;
+//glm
+#include <gtx/euler_angles.hpp>
+#include <gtx/quaternion.hpp>
+#endif
 
 inline HmdQuaternion_t HmdQuaternion_Init( double w, double x, double y, double z )
 {
@@ -84,4 +92,52 @@ typedef struct KeyBoardForControllerButton_{
 #define CONTROLLER_BUTTON_TRIGGER			(1<<6)
 #define CONTROLLER_BUTTON_GRIP				(1<<7)
 #define CONTROLLER_BUTTON_TRACKEPAD_PRESS	(1<<8)
+
+#ifdef USE_XIMMERSE_SIX_DOF_TRACKING_MODULE
+typedef enum{
+	XIMMERSE_HAWK 								= 0,
+	XIMMERSE_COBRA_0 							= 1,
+	XIMMERSE_COBRA_1							= 2,
+	XIMMERSE_VRDEVICE							= 3,
+	XIMMERSE_DEVICE_MAX							= 4
+}EXimmerseHandle;
+
+#define DOUBLE_CLICK_INTERVAL			150 //150ms
+#endif
+
+typedef enum {
+    NONE_SIX_DOF_TRACKING_MODULE 				= 0,
+	NOLO_SIX_DOF_TRACKING_MODULE				= 1,
+	XIMMERSE_SIX_DOF_TRACKING_MODULE			= 2
+}ESixDofTrackingModule;
+	
+#define NONE_SIX_DOF_CONTROLLER_POSE_REPORT_INTERVAL				1000	
+#define NOLO_SIX_DOF_CONTROLLER_POSE_REPORT_INTERVAL				8
+#define XIMMERSE_SIX_DOF_CONTROLLER_POSE_REPORT_INTERVAL			8
+
+typedef enum POSTMESSAGETYPE{
+    POST_MESSAGE_START = WM_USER + 1,
+	POST_MESSAGE_RECENTER,
+	POST_MESSAGE_TURN_AROUND,
+	POST_MESSAGE_END
+}EPostMessageType;
+
+/** 
+	keys for use with the settings API
+*/
+static const char * const k_pch_Sample_Section = "driver_helenxr";
+static const char * const k_pch_Sample_SerialNumber_String = "serialNumber";
+static const char * const k_pch_Sample_ModelNumber_String = "modelNumber";
+static const char * const k_pch_Sample_WindowX_Int32 = "windowX";
+static const char * const k_pch_Sample_WindowY_Int32 = "windowY";
+static const char * const k_pch_Sample_WindowWidth_Int32 = "windowWidth";
+static const char * const k_pch_Sample_WindowHeight_Int32 = "windowHeight";
+static const char * const k_pch_Sample_RenderWidth_Int32 = "renderWidth";
+static const char * const k_pch_Sample_RenderHeight_Int32 = "renderHeight";
+static const char * const k_pch_Sample_SecondsFromVsyncToPhotons_Float = "secondsFromVsyncToPhotons";
+static const char * const k_pch_Sample_DisplayFrequency_Float = "displayFrequency";
+static const char * const k_pch_Sample_HmdXPositionOffset_Float = "hmd_x_position_offset";
+static const char * const k_pch_Sample_HmdYPositionOffset_Float = "hmd_y_position_offset";
+static const char * const k_pch_Sample_HmdZPositionOffset_Float = "hmd_z_position_offset";
+
 #endif

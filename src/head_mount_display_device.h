@@ -16,21 +16,6 @@
 #include "keyboard_monitor.h"
 #endif	
 
-/** 
-	keys for use with the settings API
-*/
-static const char * const k_pch_Sample_Section = "driver_helenxr";
-static const char * const k_pch_Sample_SerialNumber_String = "serialNumber";
-static const char * const k_pch_Sample_ModelNumber_String = "modelNumber";
-static const char * const k_pch_Sample_WindowX_Int32 = "windowX";
-static const char * const k_pch_Sample_WindowY_Int32 = "windowY";
-static const char * const k_pch_Sample_WindowWidth_Int32 = "windowWidth";
-static const char * const k_pch_Sample_WindowHeight_Int32 = "windowHeight";
-static const char * const k_pch_Sample_RenderWidth_Int32 = "renderWidth";
-static const char * const k_pch_Sample_RenderHeight_Int32 = "renderHeight";
-static const char * const k_pch_Sample_SecondsFromVsyncToPhotons_Float = "secondsFromVsyncToPhotons";
-static const char * const k_pch_Sample_DisplayFrequency_Float = "displayFrequency";
-
 /**
 	CHeadMountDisplayDevice implement  ITrackedDeviceServerDriver and IVRDisplayComponent.
 */
@@ -139,6 +124,22 @@ public:
 		return quaternion_dest;
 	}
 	vr::DriverPose_t CHeadMountDisplayDevice::GetMemberPose();	
+	/**
+		set six dof module type
+	*/
+	void SetSixDofModuleType(ESixDofTrackingModule six_dof_module);
+	/**
+		set six dof data.
+	*/
+	void SetSixDofData(void *six_dof_data);
+	/**
+		set turn around state.
+	*/
+	void SetTurnAroundState(const bool new_state);
+	/**
+		set hmd position when turn around.
+	*/
+	void SetHmdPositionWhenTurnAround(const double hmd_position[3]);
 private:
 	vr::TrackedDeviceIndex_t m_unObjectId;//< unique id ,set by vrserver through Activate function
 	vr::PropertyContainerHandle_t m_ulPropertyContainer;//< use to set/get property
@@ -170,5 +171,11 @@ private:
 	double m_dForwardDirectionInYaw;	//<Forward direction in yaw unit:degree
 	vr::HmdQuaternion_t m_OriginRotation; //< Orientation of the tracker rotation.
 	vr::DriverPose_t m_Pose;			//HMD pose.
+	ESixDofTrackingModule m_eSixModuleType;			//< six dof tracking module e.g nolo,ximmerse
+	float m_fHmdXPositionOffset;	//< six dof tracking module X position offset.
+	float m_fHmdYPositionOffset;	//< six dof tracking module Y position offset.
+	float m_fHmdZPositionOffset;	//< six dof tracking module Z position offset.	
+	bool m_bTrunAround;				//< true:rotate 180 degree in yaw. false: normal
+	double m_dHmdPositionWhenTurnAround[3];						//< hmd position When turn around	
 };
 #endif

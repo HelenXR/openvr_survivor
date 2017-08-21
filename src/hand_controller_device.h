@@ -70,13 +70,66 @@ public:
 		@return return unique object id which set by Activate function.
 	*/
 	const uint32_t GetUniqueObjectId();
+	#ifdef USE_XIMMERSE_SIX_DOF_TRACKING_MODULE
+	/**
+		set ximmerse cobra handle;
+	*/
+	void SetXimmerseCobraHandle(int cobra_handle);
+	/**
+		@param[in] controller state.
+	*/
+	void ReportXimmerseButton(ximmerse::ControllerState controller_state);	
+	#endif
+	/**
+		set six dof module type.
+	*/
+	void SetSixDofModuleType(ESixDofTrackingModule six_dof_module);
+	/**
+		set controller's pose interval.
+	*/	
+	void CHandControllerDevice::SetReportPoseInterval(const int new_interval);
+	/**
+		set pose state.
+	*/
+	void SetPoseState(bool new_state);
+	/**
+		set six dof data.
+	*/
+	void SetSixDofData(void *six_dof_data);
+	/**
+		set handle for post message to server.
+	*/
+	void CHandControllerDevice::SetServerProviderHandleTrackedDevicePostMessageThreadID(uint64_t thread_id);
+	/**
+		set turn around state.
+	*/
+	void SetTurnAroundState(const bool new_state);
+	/**
+		set hmd position when turn around.
+	*/
+	void SetHmdPositionWhenTurnAround(const double hmd_position[3]);
+	/**
+		Recenter Controller
+	*/
+	void RecenterController();	
+	/**
+		Get DPad Button Region from position(x,y) 
+		@return k_EButton_DPad_Left,k_EButton_DPad_Up,k_EButton_DPad_Right,k_EButton_DPad_Down.
+	*/
+	vr::EVRButtonId GetDPadButton(float x,float y);
+	/**
+		@param[in] controller state.
+	*/
+	void ReportControllerButton(vr::VRControllerState_t controller_state,void *p_vendor_state); 
+	
+
 private:
 	void ReportPoseButtonThread();//< report hand controller's pose and button state.
 	void GetButtonState(KeyBoardForControllerButton button_state);//< update button state
 	void SendButtonUpdates(ButtonUpdate ButtonEvent, uint64_t ulMask);//< helper function for TrackedDeviceButtonPressed,TrackedDeviceButtonUnpressed,TrackedDeviceButtonTouched,TrackedDeviceButtonUntouched 
 	string m_sSerialNumber;					//< serial number
 	uint32_t m_nUniqueObjectId;				//< unique object id which set by active function
-	DriverPose_t m_Pose;					//< hand controller's pose
+	vr::DriverPose_t m_Pose;					//< hand controller's pose
 	EHandController m_eHandController;		//< indicate left or right hand
 	vr::VRControllerState_t m_ControllerState;//< controller state
 	vr::PropertyContainerHandle_t m_PropertyContainerHandle;//< set/get property
@@ -85,6 +138,22 @@ private:
 #if defined(CONTROLLER_ROTATE_BY_KEYBOARD) || defined(CONTROLLER_POSITION_BY_KEYBOARD)
 	KeyBoardMonitor *m_pKeyBoardMonitor;	//< pointer to keyboard monitor.
 #endif	
+#ifdef USE_XIMMERSE_SIX_DOF_TRACKING_MODULE
+	int m_nXimmerseXCobraHandle;			//< Ximmerse Controller handle
+	unsigned long m_uButtonPressCurrentTime;		//< for detect button double click 
+	unsigned long m_uButtonPressLastTime;			//< for detect button double click 
+	unsigned long m_uButton2PressCurrentTime;		//< for detect button2 double click 
+	unsigned long m_uButton2PressLastTime;			//< for detect button2 double click 	
+#endif
+	char m_cControllerRole; 				//< 'L' or 'R' controller.
+	ESixDofTrackingModule m_eSixModuleType;			//< six dof tracking module e.g nolo,ximmerse.
+	std::chrono::milliseconds m_nReportPoseInterval;			//< report controller's pose interval.
+	float m_fHmdXPositionOffset;	//< six dof tracking module X position offset.
+	float m_fHmdYPositionOffset;	//< six dof tracking module Y position offset.
+	float m_fHmdZPositionOffset;	//< six dof tracking module Z position offset.		
+	uint64_t m_uServerProviderHandleTrackedDevicePostMessageThreadID; //< server provider HandleTrackedDevicePostMessageThreadID;
+	bool m_bTrunAround;				//< true:rotate 180 degree in yaw. false: normal
+	double m_dHmdPositionWhenTurnAround[3];						//< hmd position When turn around	
 };
 
 #endif
