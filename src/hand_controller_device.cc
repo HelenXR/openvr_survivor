@@ -52,7 +52,11 @@ EVRInitError CHandControllerDevice::Activate( uint32_t unObjectId ){
 	uint64_t u64_parameter;
 	m_nUniqueObjectId = unObjectId;
 	m_PropertyContainerHandle = vr::VRProperties()->TrackedDeviceToPropertyContainer(m_nUniqueObjectId);
-	
+
+	//set controller's display to htc.
+	vr::VRProperties()->SetStringProperty(m_PropertyContainerHandle, vr::Prop_ModelNumber_String, "ViveMV");
+	vr::VRProperties()->SetStringProperty(m_PropertyContainerHandle, vr::Prop_ManufacturerName_String, "HTC");
+	vr::VRProperties()->SetStringProperty(m_PropertyContainerHandle, vr::Prop_RenderModelName_String, "vr_controller_vive_1_5");
 	//set general properties
 	vr::VRProperties()->SetStringProperty( m_PropertyContainerHandle, Prop_TrackingSystemName_String, "Survivor's Controller" );
 	vr::VRProperties()->SetInt32Property( m_PropertyContainerHandle, Prop_DeviceClass_Int32, TrackedDeviceClass_Controller);
