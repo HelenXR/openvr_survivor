@@ -38,11 +38,13 @@ CHandControllerDevice::CHandControllerDevice(string serial_number,ETrackedContro
 	m_fHmdZPositionOffset = vr::VRSettings()->GetFloat( k_pch_Sample_Section, k_pch_Sample_HmdZPositionOffset_Float );
 	m_eSixModuleType = NONE_SIX_DOF_TRACKING_MODULE;
 	m_nReportPoseInterval = std::chrono::milliseconds( NONE_SIX_DOF_CONTROLLER_POSE_REPORT_INTERVAL );
+#ifdef USE_XIMMERSE_SIX_DOF_TRACKING_MODULE
 	m_nXimmerseXCobraHandle = -1;
 	m_uButtonPressCurrentTime = 0;
 	m_uButtonPressLastTime = 0;
 	m_uButton2PressCurrentTime = 0;
 	m_uButton2PressLastTime = 0;	
+#endif	
 	m_uServerProviderHandleTrackedDevicePostMessageThreadID = -1;
 	m_bTrunAround = false;
 	
@@ -188,7 +190,21 @@ VRControllerState_t CHandControllerDevice::GetControllerState( ){
 }
 bool CHandControllerDevice::TriggerHapticPulse( uint32_t unAxisId, uint16_t usPulseDurationMicroseconds ){
 	LOG(INFO) << __FUNCTION__;
-	return false;
+#ifdef USE_NOLO_SIX_DOF_TRACKING_MODULE
+	if(m_eSixModuleType == NOLO_SIX_DOF_TRACKING_MODULE){
+		int intensity = usPulseDurationMicroseconds/40;	
+		if (intensity>50) {	
+			intensity = 50;
+		}
+		if(m_cControllerRole == 'L'){
+			NOLO::set_Nolo_TriggerHapticPulse(NOLO::LeftControllerDevice ,intensity + 50);
+		}else{
+			NOLO::set_Nolo_TriggerHapticPulse(NOLO::RightControllerDevice ,intensity + 50);
+		}
+
+	}
+#endif
+	return true;
 }
 
 const char *CHandControllerDevice::GetSerialNumber(){
@@ -433,6 +449,84 @@ void CHandControllerDevice::SetSixDofData(void *six_dof_data){
 		ReportXimmerseButton(*state);
 	}
 #endif
+
+#ifdef USE_NOLO_SIX_DOF_TRACKING_MODULE
+		if(m_eSixModuleType == NOLO_SIX_DOF_TRACKING_MODULE){
+			NOLO::Controller *controller = reinterpret_cast<NOLO::Controller *>(six_dof_data);
+			m_Pose.vecPosition[0] =  (double)controller->ControllerPosition.x;
+			m_Pose.vecPosition[1] =  (double)controller->ControllerPosition.y;
+			m_Pose.vecPosition[2] =  -(double)controller->ControllerPosition.z;
+			
+			m_Pose.qRotation.x = controller->ControllerRotation.x;
+			m_Pose.qRotation.y = controller->ControllerRotation.y;
+			m_Pose.qRotation.z = -controller->ControllerRotation.z;
+			m_Pose.qRotation.w = -controller->ControllerRotation.w;
+			/*
+			//handle throw action.
+			if (controller->Buttons & NOLO_BUTTON_TRIGGER_PRESS) {
+	
+				m_bNoloTriggerDown = true;
+			}
+			if (m_bNoloTriggerDown && (controller->Buttons & NOLO_BUTTON_TRIGGER_PRESS) == 0) {
+	
+				m_bNoloTriggerDown = false;
+				m_bNoloThrowFlag = true;
+	
+			}
+			if (m_bNoloThrowFlag) {
+	
+			
+	
+				m_Pose.vecVelocity[0] = controller->vecVelocity.x;
+				m_Pose.vecVelocity[1] = controller->vecVelocity.y;
+				m_Pose.vecVelocity[2] = controller->vecVelocity.z;
+	
+				m_Pose.vecAngularVelocity[0] = controller->vecAngularVelocity.x;
+				m_Pose.vecAngularVelocity[1] = controller->vecAngularVelocity.y;
+				m_Pose.vecAngularVelocity[2] = controller->vecAngularVelocity.z;
+	
+				m_nNoloThrowCount++;
+				if (m_Pose.vecVelocity[0] > 0.0 && m_Pose.vecVelocity[1] > 0.0 && m_nNoloThrowCount > 1 ) {
+					m_nNoloThrowCount = 0;
+					m_bNoloThrowFlag = false;
+				}
+			}
+			else
+			{
+				m_Pose.vecVelocity[0] = 0.0f;
+				m_Pose.vecVelocity[1] = 0.0f;
+				m_Pose.vecVelocity[2] = 0.0f;
+				m_Pose.vecAngularVelocity[0] = 0.0f;
+				m_Pose.vecAngularVelocity[1] = 0.0f;
+				m_Pose.vecAngularVelocity[2] = 0.0f;
+			}	*/
+			//report controller buttons.
+			vr::VRControllerState_t vr_controller_state = {};
+			if(controller->Buttons & NOLO_BUTTON_DPAD_PRESS){
+				vr_controller_state.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad);
+				vr_controller_state.rAxis[0].x = controller->ControllerTouchAxis.x;
+				vr_controller_state.rAxis[0].y = controller->ControllerTouchAxis.y;
+			}
+			if(controller->Buttons & NOLO_BUTTON_TRIGGER_PRESS){
+				vr_controller_state.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Trigger);
+				vr_controller_state.rAxis[1].x = 1.0f;
+				vr_controller_state.rAxis[1].y = 0.0f;		
+			}
+			if(controller->Buttons & NOLO_BUTTON_MENU){
+				vr_controller_state.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu);
+			}
+			if(controller->Buttons & NOLO_BUTTON_SYSTEM){
+				vr_controller_state.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_System);
+			}
+			if(controller->Buttons & NOLO_BUTTON_GRIP){
+				vr_controller_state.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_Grip);
+			}
+			ReportControllerButton(vr_controller_state,NULL);
+	
+	
+		}
+#endif
+
 	if(m_eSixModuleType != NONE_SIX_DOF_TRACKING_MODULE){
 		if(m_bTrunAround){
 			vr::HmdQuaternion_t quaternion_rotate = HmdQuaternion_Init( 0, 0, 1, 0 );
@@ -486,26 +580,27 @@ vr::EVRButtonId CHandControllerDevice::GetDPadButton(float float_x,float float_y
 	 }
 
 	int x = float_x * 10000.0f,y = float_y * 10000.0f;
-	 //UP:0<y<1 -y<x<y
-	 if(y > 0 && y < 10000	&& x > -y && x<y){
+	 //UP:-y<x<y
+	 if(x > -y && x < y){
 	 	LOG_EVERY_N(INFO,1 * 90) << "GetDPadButton[" << m_cControllerRole << "]:k_EButton_DPad_Up";
 	 	return vr::k_EButton_DPad_Up;
 	 }
-	 //DOWN:-1<y<0 y<x<-y
-	 if(y > -10000 && y < 0 && x > y && x < -y){
+	 //DOWN:y<x<-y
+	 if(x > y && x < -y){
 	 	LOG_EVERY_N(INFO,1 * 90) << "GetDPadButton[" << m_cControllerRole << "]:k_EButton_DPad_Down";
 	 	return vr::k_EButton_DPad_Down;
 	 }
-	 //LEFT:-1<x<0 x<y<-x
-	 if(x > -10000 && x < 0 && y > x && y < -x){
+	 //LEFT:x<y<-x
+	 if(y > x && y < -x){
 	 	LOG_EVERY_N(INFO,1 * 90) << "GetDPadButton[" << m_cControllerRole << "]:k_EButton_DPad_Left";
 	 	return vr::k_EButton_DPad_Left;
 	 }
-	 //RIGHT:0<x<1 -x<y<x
-	 if(x > 0 && x < 10000 && y > -x && y < x){
+	 //RIGHT:-x<y<x
+	 if(y > -x && y < x){
 	 	LOG_EVERY_N(INFO,1 * 90) << "GetDPadButton[" << m_cControllerRole << "]:k_EButton_DPad_Right";
 	 	return vr::k_EButton_DPad_Right;
 	 }
+
 	 LOG_EVERY_N(INFO,1 * 90) << "GetDPadButton[" << m_cControllerRole << "]:unknown region(" << x << "," << y << "),float(" << float_x << "," << "" << float_y <<")";
 	 return vr::k_EButton_Max;
 }
@@ -514,14 +609,14 @@ void CHandControllerDevice::ReportControllerButton(vr::VRControllerState_t contr
 	vr::EVRButtonId touch_pad_id = vr::k_EButton_Max;
 	vr::VRControllerState_t new_state = controller_state;
 	new_state.unPacketNum = m_ControllerState.unPacketNum + 1;
-	/*
-	if(new_state.ulButtonPressed & vr::k_EButton_SteamVR_Touchpad){
+	
+	if(new_state.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad)){
 		touch_pad_id = GetDPadButton(new_state.rAxis[0].x,new_state.rAxis[0].y);
 		if(touch_pad_id != vr::k_EButton_Max){
 			new_state.ulButtonPressed |= vr::ButtonMaskFromId(touch_pad_id);
 		}
 	}
-	*/
+	
 	new_state.ulButtonTouched |= new_state.ulButtonPressed;
 
 	uint64_t ulChangedTouched = new_state.ulButtonTouched ^ m_ControllerState.ulButtonTouched;

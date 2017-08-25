@@ -21,6 +21,8 @@
 //#define CONTROLLER_POSITION_BY_KEYBOARD
 
 //use ximmerse tracking module
-#define USE_XIMMERSE_SIX_DOF_TRACKING_MODULE
+//#define USE_XIMMERSE_SIX_DOF_TRACKING_MODULE
+//use nolo tracking module
+#define USE_NOLO_SIX_DOF_TRACKING_MODULE
 
 #endif

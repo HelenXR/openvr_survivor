@@ -86,6 +86,24 @@ public:
 		HandleTrackedDevicePostMessageThread.
 	*/
 	void HandleTrackedDevicePostMessageThread();	
+	#ifdef USE_NOLO_SIX_DOF_TRACKING_MODULE
+	/**
+		when hmd tracking module connected,this function will be call.
+	*/
+	static void NoloHMDModuleConnect(void *context);
+	/**
+		when hmd tracking module disconnected,this function will be call
+	*/
+	static void NoloHMDModuleDisconnect(void *context);
+	/**
+		when nolo data(hmd or controllers) data is ready,this function will be call.
+	*/
+	static void NoloDataNotify(NOLO::NoloData noloData,void *context);
+	/**
+		when nolo expand msg (e.g double click Home/System) notify,this function will be call.
+	*/
+	static void NoloExpandDataNotify(NOLO::ExpandMsgType expandMsgType , void *context);
+	#endif	
 private:
 	
 	CHeadMountDisplayDevice *m_pHeadMountDisplay;///< pointer to HMD
@@ -100,7 +118,7 @@ private:
 	std::thread m_tHandleTrackedDevicePostMessageThread;		//<handle all tracked devices' message;
 	bool m_bHandleTrackedDevicePostMessageThreadState;			//<false:stop true:running.
 	uint64_t m_uHandleTrackedDevicePostMessageThreadID;			//< HandleTrackedDevicePostMessageThread id;	
-
+	static	CServerProvider *m_pThis;							//< use to static member pointer this.
 };
 
 #endif

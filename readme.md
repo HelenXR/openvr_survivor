@@ -85,5 +85,6 @@ Development plan
 - Added direct rendering support.
 - Problem fixing and improvement.
 - ~~Add recenter function.~~
-- ~~Add six dof module support(ximmerse).~~
+- ~~Add six dof module support(ximmerse & nolo).~~
+
 This is a preliminary version, relying on personal strength is difficult to perfect, if you have any good suggestions ,you can post in [gitter chat room](https://gitter.im/openvr_survivor/Lobby),and if you would like to join us, please contact me, my mailbox:helenhololens@gmail.com. 

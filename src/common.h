@@ -39,6 +39,11 @@ using namespace ximmerse;
 #include <gtx/euler_angles.hpp>
 #include <gtx/quaternion.hpp>
 #endif
+#ifdef USE_NOLO_SIX_DOF_TRACKING_MODULE
+#pragma comment(lib,"NoLo_USBHID.lib")
+#include "nolo_api.h"
+using namespace NOLO;
+#endif
 
 inline HmdQuaternion_t HmdQuaternion_Init( double w, double x, double y, double z )
 {
@@ -139,5 +144,12 @@ static const char * const k_pch_Sample_DisplayFrequency_Float = "displayFrequenc
 static const char * const k_pch_Sample_HmdXPositionOffset_Float = "hmd_x_position_offset";
 static const char * const k_pch_Sample_HmdYPositionOffset_Float = "hmd_y_position_offset";
 static const char * const k_pch_Sample_HmdZPositionOffset_Float = "hmd_z_position_offset";
+#ifdef USE_NOLO_SIX_DOF_TRACKING_MODULE
+#define NOLO_BUTTON_DPAD_PRESS				(0x01 << 0)
+#define NOLO_BUTTON_TRIGGER_PRESS			(0x01 << 1)
+#define NOLO_BUTTON_MENU					(0x01 << 2)
+#define NOLO_BUTTON_SYSTEM					(0x01 << 3)
+#define NOLO_BUTTON_GRIP					(0x01 << 4)
+#endif
 
 #endif

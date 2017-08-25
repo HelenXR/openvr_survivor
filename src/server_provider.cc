@@ -4,12 +4,14 @@ CServerProvider::CServerProvider(){
 	m_eSixDofTrackingModule = NONE_SIX_DOF_TRACKING_MODULE;
 	m_bControllerState[LEFT_HAND_CONTROLLER] = false;
 	m_bControllerState[RIGHT_HAND_CONTROLLER] = false;
+	m_pThis = this;
 }
 
 CServerProvider::~CServerProvider(){
 
 }
 
+CServerProvider *CServerProvider::m_pThis = NULL;
 vr::EVRInitError CServerProvider::Init( IVRDriverContext *pDriverContext ){
 
 	//set log dir:steam/logs,you can set,you can set the path you want, but you need to make sure 
@@ -49,7 +51,10 @@ void CServerProvider::Cleanup(){
 	m_tMultiLightWeightFunctionThread.join();
 	m_bHandleTrackedDevicePostMessageThreadState = false;
 	m_tHandleTrackedDevicePostMessageThread.join();	
-
+	//clear six dof module
+#ifdef USE_NOLO_SIX_DOF_TRACKING_MODULE
+		NOLO::close_Nolo_Device();
+#endif
 #ifdef USE_XIMMERSE_SIX_DOF_TRACKING_MODULE
 	XDeviceExit();	
 #endif	
@@ -148,6 +153,16 @@ void CServerProvider::SixDofTrackingModuleInit(){
 			else{
 				LOG(INFO) << "ximmerse hawk handle error!";
 			}
+#endif
+
+#ifdef USE_NOLO_SIX_DOF_TRACKING_MODULE
+		//LOG(INFO) << "SixDofTrackingModuleInit:this=" << this;
+		NOLO::registerConnectSuccessCallBack(NoloHMDModuleConnect,this);
+		NOLO::registerDisConnectCallBack(NoloHMDModuleDisconnect,this);
+		NOLO::registerNoloDataNotifyCallBack(NoloDataNotify,this);
+		NOLO::registerExpandDataNotifyCallBack(NoloExpandDataNotify,this);
+		Sleep(100);
+		NOLO::search_Nolo_Device(); 
 #endif
 
 }
@@ -353,4 +368,97 @@ void CServerProvider::HandleTrackedDevicePostMessageThread(){
 	LOG(INFO) << "HandleTrackedDevicePostMessageThread:exit!" ;
 }
 
+#ifdef USE_NOLO_SIX_DOF_TRACKING_MODULE
+void CServerProvider::NoloHMDModuleConnect(void *context){
+	LOG(INFO) << "NoloHMDModuleConnect.m_pThis=" << m_pThis;
+	m_pThis->SetSixDofModuleType(NOLO_SIX_DOF_TRACKING_MODULE);
+}
+void CServerProvider::NoloHMDModuleDisconnect(void *context){
+	LOG(INFO) << "NoloHMDModuleDisconnect.";
+	m_pThis->SetSixDofModuleType(NONE_SIX_DOF_TRACKING_MODULE);
+}
+void CServerProvider::NoloDataNotify(NOLO::NoloData noloData,void * context){
+	//LOG_EVERY_N(INFO,5*130) << "NoloDataNotify.";
+	VLOG_EVERY_N(1,5*130) << "NoloDataNotify:p(" << m_pThis->m_pHandControllerDevice[LEFT_HAND_CONTROLLER] << "," << m_pThis->m_pHandControllerDevice[RIGHT_HAND_CONTROLLER]
+	<< "),state(" << m_pThis->m_bControllerState[LEFT_HAND_CONTROLLER] << "," << m_pThis->m_bControllerState[RIGHT_HAND_CONTROLLER] << "),battery("
+	<< noloData.left_Controller_Data.ControllerBattery << "," << noloData.right_Controller_Data.ControllerBattery << ")";
+
+	if(m_pThis->m_pHeadMountDisplay != NULL){
+		m_pThis->m_pHeadMountDisplay->SetSixDofData(&noloData.hmdData);
+	}
+	if(m_pThis->m_pHandControllerDevice[LEFT_HAND_CONTROLLER] != NULL){
+		if((m_pThis->m_bControllerState[LEFT_HAND_CONTROLLER] == true) && 
+			(noloData.left_Controller_Data.ControllerBattery == NOLO::ShutDown)){
+			m_pThis->m_bControllerState[LEFT_HAND_CONTROLLER] = false;
+			m_pThis->m_pHandControllerDevice[LEFT_HAND_CONTROLLER]->SetPoseState(false);
+		}
+			
+		if((m_pThis->m_bControllerState[LEFT_HAND_CONTROLLER] == false) && 
+			(noloData.left_Controller_Data.ControllerBattery != NOLO::ShutDown)){
+				m_pThis->m_bControllerState[LEFT_HAND_CONTROLLER] = true;
+				m_pThis->m_pHandControllerDevice[LEFT_HAND_CONTROLLER]->SetPoseState(true);
+			}
+			
+		if(m_pThis->m_bControllerState[LEFT_HAND_CONTROLLER] == true){
+			m_pThis->m_pHandControllerDevice[LEFT_HAND_CONTROLLER]->SetSixDofData(&noloData.left_Controller_Data);	
+		}
+	}
+	if(m_pThis->m_pHandControllerDevice[RIGHT_HAND_CONTROLLER] != NULL){
+		if((m_pThis->m_bControllerState[RIGHT_HAND_CONTROLLER] == true) && 
+			(noloData.right_Controller_Data.ControllerBattery == NOLO::ShutDown)){
+			m_pThis->m_bControllerState[RIGHT_HAND_CONTROLLER] = false;
+			m_pThis->m_pHandControllerDevice[RIGHT_HAND_CONTROLLER]->SetPoseState(false);
+		}
+			
+		if((m_pThis->m_bControllerState[RIGHT_HAND_CONTROLLER] == false) && 
+			(noloData.right_Controller_Data.ControllerBattery != NOLO::ShutDown)){
+				m_pThis->m_bControllerState[RIGHT_HAND_CONTROLLER] = true;
+				m_pThis->m_pHandControllerDevice[RIGHT_HAND_CONTROLLER]->SetPoseState(true);
+		}
+			
+		if(m_pThis->m_bControllerState[RIGHT_HAND_CONTROLLER] == true){
+			m_pThis->m_pHandControllerDevice[RIGHT_HAND_CONTROLLER]->SetSixDofData(&noloData.right_Controller_Data);	
+		}
+	}
+
+}
+void CServerProvider::NoloExpandDataNotify(NOLO::ExpandMsgType expandMsgType , void * context){
+	static bool turn_arounded = false;
+	LOG(INFO) << "NoloExpandDataNotify:" << expandMsgType;
+	switch(expandMsgType){
+		case NOLO::DoubleClickKeyTurnAround:
+			if(turn_arounded == false){
+				turn_arounded = true;
+				m_pThis->m_pHeadMountDisplay->SetTurnAroundState(true);
+				m_pThis->m_pHeadMountDisplay->SetHmdPositionWhenTurnAround(m_pThis->m_pHeadMountDisplay->GetMemberPose().vecPosition);
+				m_pThis->m_pHandControllerDevice[LEFT_HAND_CONTROLLER]->SetTurnAroundState(true);
+				m_pThis->m_pHandControllerDevice[LEFT_HAND_CONTROLLER]->SetHmdPositionWhenTurnAround(m_pThis->m_pHeadMountDisplay->GetMemberPose().vecPosition);
+				m_pThis->m_pHandControllerDevice[RIGHT_HAND_CONTROLLER]->SetTurnAroundState(true);
+				m_pThis->m_pHandControllerDevice[RIGHT_HAND_CONTROLLER]->SetHmdPositionWhenTurnAround(m_pThis->m_pHeadMountDisplay->GetMemberPose().vecPosition);				
+			}else{
+				turn_arounded = false;
+				m_pThis->m_pHeadMountDisplay->SetTurnAroundState(false);
+				m_pThis->m_pHandControllerDevice[LEFT_HAND_CONTROLLER]->SetTurnAroundState(false);
+				m_pThis->m_pHandControllerDevice[RIGHT_HAND_CONTROLLER]->SetTurnAroundState(false);
+			}
+			break;
+		case NOLO::DoubleClickSystemRecenter:
+			if(turn_arounded){
+				turn_arounded = false;
+				m_pThis->m_pHeadMountDisplay->SetTurnAroundState(false);
+				m_pThis->m_pHandControllerDevice[LEFT_HAND_CONTROLLER]->SetTurnAroundState(false);
+				m_pThis->m_pHandControllerDevice[RIGHT_HAND_CONTROLLER]->SetTurnAroundState(false);
+				Sleep(300);
+			}
+			m_pThis->m_pHeadMountDisplay->SetForwardDirectionInYaw(0.0f);
+			m_pThis->m_pHeadMountDisplay->RecenterHMD();
+			//if turn_around = true  must be do this
+			turn_arounded = false;			
+			break;
+		default:
+			LOG(WARNING) << "NoloExpandDataNotify:unknown type(" << expandMsgType << ")!";
+			break;
+	}
+}
+#endif
 

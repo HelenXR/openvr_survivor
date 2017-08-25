@@ -317,6 +317,15 @@ void CHeadMountDisplayDevice::SetSixDofData(void *six_dof_data){
 		m_Pose.vecPosition[2] = hmdPos[2] + m_fHmdZPositionOffset;	
 	}
 #endif
+#ifdef USE_NOLO_SIX_DOF_TRACKING_MODULE
+		if(m_eSixModuleType == NOLO_SIX_DOF_TRACKING_MODULE){
+			NOLO::HMD *hmd=reinterpret_cast<NOLO::HMD *>(six_dof_data);
+			m_Pose.vecPosition[0] = hmd->HMDPosition.x ;
+			m_Pose.vecPosition[1] = hmd->HMDPosition.y ;
+			m_Pose.vecPosition[2] = -hmd->HMDPosition.z ;
+		}
+#endif	
+
 	if(m_eSixModuleType != NONE_SIX_DOF_TRACKING_MODULE){
 		if(m_bTrunAround){
 	        vr::HmdQuaternion_t quaternion_rotate = HmdQuaternion_Init( 0, 0, 1, 0 );
