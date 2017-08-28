@@ -27,7 +27,7 @@ Use CMake to build visual studio project, and then open the "openvr_survivor.sln
       "renderWidth" : 1920,
       "renderHeight" : 1080,
 ```
-
+more build information in [wiki](https://github.com/HelenXR/openvr_survivor/wiki)
 [compiled driver](https://github.com/HelenXR/Documents/blob/master/package/openvr_survivor.rar)
 
 HMD 6dof:
