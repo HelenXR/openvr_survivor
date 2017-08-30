@@ -26,6 +26,8 @@ CHeadMountDisplayDevice::CHeadMountDisplayDevice(){
 	m_fHmdXPositionOffset = vr::VRSettings()->GetFloat( k_pch_Sample_Section, k_pch_Sample_HmdXPositionOffset_Float );
 	m_fHmdYPositionOffset = vr::VRSettings()->GetFloat( k_pch_Sample_Section, k_pch_Sample_HmdYPositionOffset_Float );
 	m_fHmdZPositionOffset = vr::VRSettings()->GetFloat( k_pch_Sample_Section, k_pch_Sample_HmdZPositionOffset_Float );
+    m_bTopCamera = vr::VRSettings()->GetBool( k_pch_Sample_Section, k_pch_Sample_TopCamera );
+    m_bCameraHeight = vr::VRSettings()->GetFloat( k_pch_Sample_Section, k_pch_Sample_CameraHeight );
 
 	m_fDistortionK1 = 0.91f;
 	m_fDistortionK2 = 0.93f;
@@ -305,16 +307,26 @@ void CHeadMountDisplayDevice::SetSixDofData(void *six_dof_data){
 #ifdef USE_XIMMERSE_SIX_DOF_TRACKING_MODULE
 	if(m_eSixModuleType == XIMMERSE_SIX_DOF_TRACKING_MODULE){
 		float *hmdPos =reinterpret_cast<float *>(six_dof_data);
-		glm::mat4x4 modelMatrix;
-		simple_math::Matrix4x4_TRS(modelMatrix, 0.0f, 0.0f, -1.5f,
-			15.0f, 0.0f, 0.0f,
-			1.0f, 1.0f, 1.0f
-		);
-		simple_math::Matrix4x4_MultiplyMV(hmdPos, modelMatrix, hmdPos);
+        if (m_bTopCamera) {
+            glm::vec4 vecPosition = glm::vec4((double)hmdPos[0], (double)-hmdPos[2], (double)hmdPos[1], 1.0f);
+            glm::mat4 rts = glm::mat4(1.0);
+            rts = glm::translate(rts, glm::vec3(0, m_bCameraHeight, 0));
+            vecPosition = rts * vecPosition;
+            m_Pose.vecPosition[0] = vecPosition.x;
+            m_Pose.vecPosition[1] = vecPosition.y;
+            m_Pose.vecPosition[2] = vecPosition.z;
+        } else {
+            glm::mat4x4 modelMatrix;
+            simple_math::Matrix4x4_TRS(modelMatrix, 0.0f, 0.0f, -1.5f,
+                15.0f, 0.0f, 0.0f,
+                1.0f, 1.0f, 1.0f
+            );
+            simple_math::Matrix4x4_MultiplyMV(hmdPos, modelMatrix, hmdPos);
 
-		m_Pose.vecPosition[0] = hmdPos[0] + m_fHmdXPositionOffset;
-		m_Pose.vecPosition[1] = hmdPos[1] + m_fHmdYPositionOffset;
-		m_Pose.vecPosition[2] = hmdPos[2] + m_fHmdZPositionOffset;	
+            m_Pose.vecPosition[0] = hmdPos[0] + m_fHmdXPositionOffset;
+            m_Pose.vecPosition[1] = hmdPos[1] + m_fHmdYPositionOffset;
+            m_Pose.vecPosition[2] = hmdPos[2] + m_fHmdZPositionOffset;
+        }
 	}
 #endif
 #ifdef USE_NOLO_SIX_DOF_TRACKING_MODULE
@@ -323,6 +335,15 @@ void CHeadMountDisplayDevice::SetSixDofData(void *six_dof_data){
 			m_Pose.vecPosition[0] = hmd->HMDPosition.x ;
 			m_Pose.vecPosition[1] = hmd->HMDPosition.y ;
 			m_Pose.vecPosition[2] = -hmd->HMDPosition.z ;
+            if (m_bTopCamera) {
+                glm::vec4 vecPosition = glm::vec4((double)hmd->HMDPosition.x, (double)hmd->HMDPosition.z, (double)hmd->HMDPosition.y, 1.0f);
+                glm::mat4 rts = glm::mat4(1.0);
+                rts = glm::translate(rts, glm::vec3(0, m_bCameraHeight, 0));
+                vecPosition = rts * vecPosition;
+                m_Pose.vecPosition[0] = vecPosition.x;
+                m_Pose.vecPosition[1] = vecPosition.y;
+                m_Pose.vecPosition[2] = vecPosition.z;
+            }
 		}
 #endif	
 

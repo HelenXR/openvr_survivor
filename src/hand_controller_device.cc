@@ -36,6 +36,8 @@ CHandControllerDevice::CHandControllerDevice(string serial_number,ETrackedContro
 	m_fHmdXPositionOffset = vr::VRSettings()->GetFloat( k_pch_Sample_Section, k_pch_Sample_HmdXPositionOffset_Float );
 	m_fHmdYPositionOffset = vr::VRSettings()->GetFloat( k_pch_Sample_Section, k_pch_Sample_HmdYPositionOffset_Float );
 	m_fHmdZPositionOffset = vr::VRSettings()->GetFloat( k_pch_Sample_Section, k_pch_Sample_HmdZPositionOffset_Float );
+    m_bTopCamera = vr::VRSettings()->GetBool( k_pch_Sample_Section, k_pch_Sample_TopCamera );
+    m_bCameraHeight = vr::VRSettings()->GetFloat( k_pch_Sample_Section, k_pch_Sample_CameraHeight );
 	m_eSixModuleType = NONE_SIX_DOF_TRACKING_MODULE;
 	m_nReportPoseInterval = std::chrono::milliseconds( NONE_SIX_DOF_CONTROLLER_POSE_REPORT_INTERVAL );
 #ifdef USE_XIMMERSE_SIX_DOF_TRACKING_MODULE
@@ -433,19 +435,29 @@ void CHandControllerDevice::SetSixDofData(void *six_dof_data){
 #ifdef USE_XIMMERSE_SIX_DOF_TRACKING_MODULE
 	if(m_eSixModuleType == XIMMERSE_SIX_DOF_TRACKING_MODULE){
 		ximmerse::ControllerState *state = reinterpret_cast<ximmerse::ControllerState *>(six_dof_data);
+        if (m_bTopCamera) {
+            glm::vec4 vecPosition = glm::vec4((double)state->position.x, (double)-state->position.z, (double)state->position.y, 1.0f);
+            glm::mat4 rts = glm::mat4(1.0);
+            rts = glm::translate(rts, glm::vec3(0, m_bCameraHeight, 0));
+            vecPosition = rts * vecPosition;
+            m_Pose.vecPosition[0] = vecPosition.x;
+            m_Pose.vecPosition[1] = vecPosition.y;
+            m_Pose.vecPosition[2] = vecPosition.z;
+        } else {
+            GLM_F2Q(m_Pose.qRotation, state->rotation);		
 
-		GLM_F2Q(m_Pose.qRotation, state->rotation);		
+            glm::mat4x4 modelMatrix;
+            simple_math::Matrix4x4_TRS(modelMatrix, 0.0f, 0.0f, -1.5f,
+                15.0f, 0.0f, 0.0f,
+                1.0f, 1.0f, 1.0f
+            );
+            simple_math::Matrix4x4_MultiplyMV(state->position, modelMatrix, state->position);
 
-		glm::mat4x4 modelMatrix;
-		simple_math::Matrix4x4_TRS(modelMatrix, 0.0f, 0.0f, -1.5f,
-			15.0f, 0.0f, 0.0f,
-			1.0f, 1.0f, 1.0f
-		);
-		simple_math::Matrix4x4_MultiplyMV(state->position, modelMatrix, state->position);
+            m_Pose.vecPosition[0] = state->position[0] + m_fHmdXPositionOffset;
+            m_Pose.vecPosition[1] = state->position[1] + m_fHmdYPositionOffset;
+            m_Pose.vecPosition[2] = state->position[2] + m_fHmdZPositionOffset;
+        }
 
-		m_Pose.vecPosition[0] = state->position[0] + m_fHmdXPositionOffset;
-		m_Pose.vecPosition[1] = state->position[1] + m_fHmdYPositionOffset;
-		m_Pose.vecPosition[2] = state->position[2] + m_fHmdZPositionOffset;		
 		ReportXimmerseButton(*state);
 	}
 #endif
@@ -456,7 +468,15 @@ void CHandControllerDevice::SetSixDofData(void *six_dof_data){
 			m_Pose.vecPosition[0] =  (double)controller->ControllerPosition.x;
 			m_Pose.vecPosition[1] =  (double)controller->ControllerPosition.y;
 			m_Pose.vecPosition[2] =  -(double)controller->ControllerPosition.z;
-			
+            if (m_bTopCamera) {
+                glm::vec4 vecPosition = glm::vec4((double)controller->ControllerPosition.x, (double)controller->ControllerPosition.z, (double)controller->ControllerPosition.y, 1.0f);
+                glm::mat4 rts = glm::mat4(1.0);
+                rts = glm::translate(rts, glm::vec3(0, m_bCameraHeight, 0));
+                vecPosition = rts * vecPosition;
+                m_Pose.vecPosition[0] = vecPosition.x;
+                m_Pose.vecPosition[1] = vecPosition.y;
+                m_Pose.vecPosition[2] = vecPosition.z;
+            }
 			m_Pose.qRotation.x = controller->ControllerRotation.x;
 			m_Pose.qRotation.y = controller->ControllerRotation.y;
 			m_Pose.qRotation.z = -controller->ControllerRotation.z;

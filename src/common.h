@@ -144,6 +144,9 @@ static const char * const k_pch_Sample_DisplayFrequency_Float = "displayFrequenc
 static const char * const k_pch_Sample_HmdXPositionOffset_Float = "hmd_x_position_offset";
 static const char * const k_pch_Sample_HmdYPositionOffset_Float = "hmd_y_position_offset";
 static const char * const k_pch_Sample_HmdZPositionOffset_Float = "hmd_z_position_offset";
+static const char * const k_pch_Sample_TopCamera = "topCamera";
+static const char * const k_pch_Sample_CameraHeight = "cameraHeight";
+
 #ifdef USE_NOLO_SIX_DOF_TRACKING_MODULE
 #define NOLO_BUTTON_DPAD_PRESS				(0x01 << 0)
 #define NOLO_BUTTON_TRIGGER_PRESS			(0x01 << 1)

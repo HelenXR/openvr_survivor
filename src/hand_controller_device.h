@@ -154,6 +154,8 @@ private:
 	uint64_t m_uServerProviderHandleTrackedDevicePostMessageThreadID; //< server provider HandleTrackedDevicePostMessageThreadID;
 	bool m_bTrunAround;				//< true:rotate 180 degree in yaw. false: normal
 	double m_dHmdPositionWhenTurnAround[3];						//< hmd position When turn around	
+    bool m_bTopCamera;
+    double m_bCameraHeight;
 };
 
 #endif
