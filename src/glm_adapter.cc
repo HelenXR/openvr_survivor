@@ -3,7 +3,7 @@
 using namespace vr;
 namespace glm_adapter{
 	//HmdQuaternion_t mutiply HmdQuaternion_t
-	HmdQuaternion_t QuaternionMultiplyQuaternion(const HmdQuaternion_t quaternion_rotate,const HmdQuaternion_t quaternion_origin){
+	HmdQuaternion_t QuaternionMultiplyQuaternion(const HmdQuaternion_t& quaternion_rotate,const HmdQuaternion_t& quaternion_origin){
 		HmdQuaternion_t quaternion_dest;
 		glm::quat quat_rotate = glm::quat((float)quaternion_rotate.w, (float)quaternion_rotate.x, (float)quaternion_rotate.y, (float)quaternion_rotate.z);
 		glm::quat quat_origin = glm::quat((float)quaternion_origin.w, (float)quaternion_origin.x, (float)quaternion_origin.y, (float)quaternion_origin.z);
@@ -15,7 +15,7 @@ namespace glm_adapter{
 		return quaternion_dest;
 	}
 	//HmdQuaternion_t  mutiply double [3]
-	void QuaternionMultiplyDouble3(const vr::HmdQuaternion_t quaternion_rotate,const double position_origin[3],double position_dest[3]){
+	void QuaternionMultiplyDouble3(const vr::HmdQuaternion_t& quaternion_rotate,const double position_origin[3],double position_dest[3]){
 		glm::quat quat_rotate = glm::quat((float)quaternion_rotate.w, (float)quaternion_rotate.x, (float)quaternion_rotate.y, (float)quaternion_rotate.z);
 		glm::vec3 vec3_origin = glm::vec3(position_origin[0], position_origin[1], position_origin[2]);
 		glm::vec3 vec3_dest = quat_rotate * vec3_origin;
@@ -24,7 +24,7 @@ namespace glm_adapter{
 		position_dest[2] = vec3_dest.z;	
 	}
 	//yaw range:-90~90 pitch range:-180~180 roll range:-180~180.
-	vr::HmdQuaternion_t RotateQuaternionByYawPitchRoll(const vr::HmdQuaternion_t quaternion_origin,double yaw_degree,double pitch_degree,double roll_degree){
+	vr::HmdQuaternion_t RotateQuaternionByYawPitchRoll(const vr::HmdQuaternion_t& quaternion_origin,double yaw_degree,double pitch_degree,double roll_degree){
 		HmdQuaternion_t quaternion_dest = {0};
 #if 0
 		//convert quat to euler angle in degree.
@@ -59,7 +59,7 @@ namespace glm_adapter{
 #endif	
 		return quaternion_dest;
 	}
-	void PointAroundPointRotate(const vr::HmdQuaternion_t quaternion_rotate, const double point_origin[3], const double point_center[3], double point_dest[3]) {
+	void PointAroundPointRotate(const vr::HmdQuaternion_t& quaternion_rotate, const double point_origin[3], const double point_center[3], double point_dest[3]) {
 		glm::tquat<double> tquat_rotate(quaternion_rotate.w, quaternion_rotate.x, quaternion_rotate.y, quaternion_rotate.z);
 		glm::tvec3<double> tvec3_origin(point_origin[0], point_origin[1], point_origin[2]), tvec3_center(point_center[0], point_center[1], point_center[2]),tvec3_dest;
 		tvec3_dest = tquat_rotate * (tvec3_origin - tvec3_center) + tvec3_center;

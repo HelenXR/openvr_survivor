@@ -45,11 +45,11 @@ vr::DriverPose_t KeyBoardMonitor::GetHMDPose(){
 	return m_sHMDPose;
 }
 
-vr::DriverPose_t KeyBoardMonitor::GetControllerPose(EHandController hand_controller) {
+vr::DriverPose_t KeyBoardMonitor::GetControllerPose(const EHandController& hand_controller) {
 	LOG_IF(ERROR, hand_controller >= HAND_CONTROLLER_COUNT);
 	return m_sControllerPose[hand_controller];
 }
-KeyBoardForControllerButton KeyBoardMonitor::GetControllerButtonState(EHandController hand_controller) {
+KeyBoardForControllerButton KeyBoardMonitor::GetControllerButtonState(const EHandController& hand_controller) {
 	LOG_IF(ERROR, hand_controller >= HAND_CONTROLLER_COUNT);
 	return m_KeyBoardForControllerButton[hand_controller];
 }
@@ -76,7 +76,7 @@ bool KeyBoardMonitor::GetDetectKeyBoardThreadState() {
 	return m_bDetectKeyBoardThreadState;
 }
 
-bool KeyBoardMonitor::SetDetectKeyBoardThreadState(bool new_state) {
+bool KeyBoardMonitor::SetDetectKeyBoardThreadState(const bool& new_state) {
 	m_bDetectKeyBoardThreadState = new_state;
 	return true;
 }

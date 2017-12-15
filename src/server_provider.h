@@ -68,7 +68,7 @@ public:
 	/**
 		set six dof module  e.g:nolo ximmerse.
 	*/
-	void SetSixDofModuleType(ESixDofTrackingModule six_dof_module);
+	void SetSixDofModuleType(const ESixDofTrackingModule& six_dof_module);
 	/**
 		MultiLightWeightFunctionThread.
 		handle light weight function, e.g keyboard debug,glog log flush ,six dof detect etc.

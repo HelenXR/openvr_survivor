@@ -167,7 +167,7 @@ void CServerProvider::SixDofTrackingModuleInit(){
 
 }
 
-void CServerProvider::SetSixDofModuleType(ESixDofTrackingModule six_dof_module){
+void CServerProvider::SetSixDofModuleType(const ESixDofTrackingModule& six_dof_module){
 	m_eSixDofTrackingModule = six_dof_module;
 
 	LOG(INFO) << "SetSixDofModuleType:" << six_dof_module;
@@ -377,7 +377,7 @@ void CServerProvider::NoloHMDModuleDisconnect(void *context){
 	LOG(INFO) << "NoloHMDModuleDisconnect.";
 	m_pThis->SetSixDofModuleType(NONE_SIX_DOF_TRACKING_MODULE);
 }
-void CServerProvider::NoloDataNotify(NOLO::NoloData noloData,void * context){
+void CServerProvider::NoloDataNotify(NOLO::NoloData noloData,void *context){
 	//LOG_EVERY_N(INFO,5*130) << "NoloDataNotify.";
 	VLOG_EVERY_N(1,5*130) << "NoloDataNotify:p(" << m_pThis->m_pHandControllerDevice[LEFT_HAND_CONTROLLER] << "," << m_pThis->m_pHandControllerDevice[RIGHT_HAND_CONTROLLER]
 	<< "),state(" << m_pThis->m_bControllerState[LEFT_HAND_CONTROLLER] << "," << m_pThis->m_bControllerState[RIGHT_HAND_CONTROLLER] << "),battery("
@@ -422,7 +422,7 @@ void CServerProvider::NoloDataNotify(NOLO::NoloData noloData,void * context){
 	}
 
 }
-void CServerProvider::NoloExpandDataNotify(NOLO::ExpandMsgType expandMsgType , void * context){
+void CServerProvider::NoloExpandDataNotify(NOLO::ExpandMsgType expandMsgType , void *context){
 	static bool turn_arounded = false;
 	LOG(INFO) << "NoloExpandDataNotify:" << expandMsgType;
 	switch(expandMsgType){

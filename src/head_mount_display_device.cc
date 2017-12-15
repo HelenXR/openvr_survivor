@@ -297,7 +297,7 @@ vr::DriverPose_t CHeadMountDisplayDevice::GetMemberPose(){
 	return m_Pose;
 }
 
-void CHeadMountDisplayDevice::SetSixDofModuleType(ESixDofTrackingModule six_dof_module){
+void CHeadMountDisplayDevice::SetSixDofModuleType(const ESixDofTrackingModule& six_dof_module){
 	m_eSixModuleType = six_dof_module;
 	LOG(INFO) << "set hmd six dof module = " << six_dof_module;
 }
@@ -358,7 +358,7 @@ void CHeadMountDisplayDevice::SetSixDofData(void *six_dof_data){
 }
 
 
-void CHeadMountDisplayDevice::SetTurnAroundState(const bool new_state){
+void CHeadMountDisplayDevice::SetTurnAroundState(const bool& new_state){
 	m_bTrunAround = new_state;
 	LOG(INFO) << "set turn around state:" << new_state;
 }

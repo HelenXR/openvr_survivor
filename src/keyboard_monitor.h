@@ -41,17 +41,17 @@ public:
 		@param[in] hand_controller which hand controller.
 		@return the hand controller's pose.
 	*/
-	DriverPose_t GetControllerPose(EHandController hand_controller);
+	DriverPose_t GetControllerPose(const EHandController& hand_controller);
 	/**
 		@param[in] hand_controller which hand controller.
 		@return KeyBoardForControllerButton.
 	*/
-	KeyBoardForControllerButton GetControllerButtonState(EHandController hand_controller);
+	KeyBoardForControllerButton GetControllerButtonState(const EHandController& hand_controller);
 	bool GetDetectKeyBoardThreadState();
 	/**
 		@param[in] new_state false:stop true:running
 	*/
-	bool SetDetectKeyBoardThreadState(bool new_state);
+	bool SetDetectKeyBoardThreadState(const bool& new_state);
 protected:	
 	/**
 		singleton pattern constructor.

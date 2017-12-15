@@ -74,24 +74,24 @@ public:
 	/**
 		set ximmerse cobra handle;
 	*/
-	void SetXimmerseCobraHandle(int cobra_handle);
+	void SetXimmerseCobraHandle(const int& cobra_handle);
 	/**
 		@param[in] controller state.
 	*/
-	void ReportXimmerseButton(ximmerse::ControllerState controller_state);	
+	void ReportXimmerseButton(const ximmerse::ControllerState& controller_state);	
 	#endif
 	/**
 		set six dof module type.
 	*/
-	void SetSixDofModuleType(ESixDofTrackingModule six_dof_module);
+	void SetSixDofModuleType(const ESixDofTrackingModule& six_dof_module);
 	/**
 		set controller's pose interval.
 	*/	
-	void CHandControllerDevice::SetReportPoseInterval(const int new_interval);
+	void CHandControllerDevice::SetReportPoseInterval(const int& new_interval);
 	/**
 		set pose state.
 	*/
-	void SetPoseState(bool new_state);
+	void SetPoseState(const bool& new_state);
 	/**
 		set six dof data.
 	*/
@@ -103,7 +103,7 @@ public:
 	/**
 		set turn around state.
 	*/
-	void SetTurnAroundState(const bool new_state);
+	void SetTurnAroundState(const bool& new_state);
 	/**
 		set hmd position when turn around.
 	*/
@@ -116,16 +116,16 @@ public:
 		Get DPad Button Region from position(x,y) 
 		@return k_EButton_DPad_Left,k_EButton_DPad_Up,k_EButton_DPad_Right,k_EButton_DPad_Down.
 	*/
-	vr::EVRButtonId GetDPadButton(float x,float y);
+	vr::EVRButtonId GetDPadButton(const float& float_x,const float& float_y);
 	/**
 		@param[in] controller state.
 	*/
-	void ReportControllerButton(vr::VRControllerState_t controller_state,void *p_vendor_state); 
+	void ReportControllerButton(const vr::VRControllerState_t& controller_state,void *p_vendor_state); 
 	
 
 private:
 	void ReportPoseButtonThread();//< report hand controller's pose and button state.
-	void GetButtonState(KeyBoardForControllerButton button_state);//< update button state
+	void GetButtonState(const KeyBoardForControllerButton& button_state);//< update button state
 	void SendButtonUpdates(ButtonUpdate ButtonEvent, uint64_t ulMask);//< helper function for TrackedDeviceButtonPressed,TrackedDeviceButtonUnpressed,TrackedDeviceButtonTouched,TrackedDeviceButtonUntouched 
 	string m_sSerialNumber;					//< serial number
 	uint32_t m_nUniqueObjectId;				//< unique object id which set by active function

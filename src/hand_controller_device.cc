@@ -240,7 +240,7 @@ void CHandControllerDevice::ReportPoseButtonThread(){
 	}
 	LOG(INFO) << "ReportPoseThread:exit!" ;
 }
-void CHandControllerDevice::GetButtonState(KeyBoardForControllerButton button_state) {
+void CHandControllerDevice::GetButtonState(const KeyBoardForControllerButton& button_state) {
 	VRControllerState_t new_state = { 0 };
 	new_state.unPacketNum = m_ControllerState.unPacketNum + 1;
 
@@ -300,12 +300,12 @@ void CHandControllerDevice::SendButtonUpdates(ButtonUpdate ButtonEvent, uint64_t
 	}
 }
 #ifdef USE_XIMMERSE_SIX_DOF_TRACKING_MODULE
-void CHandControllerDevice::SetXimmerseCobraHandle(int cobra_handle){
+void CHandControllerDevice::SetXimmerseCobraHandle(const int& cobra_handle){
 	m_nXimmerseXCobraHandle = cobra_handle;
 	LOG(INFO) << "SetXimmerseDeviceHandle[" << m_cControllerRole << "]:" << cobra_handle;
 }
 
-void CHandControllerDevice::ReportXimmerseButton(ximmerse::ControllerState controller_state){
+void CHandControllerDevice::ReportXimmerseButton(const ximmerse::ControllerState& controller_state){
 	float trigger_value = 0.0f,touch_pad_x = 0.0f,touch_pad_y = 0.0f;
 	vr::EVRButtonId touch_pad_id = vr::k_EButton_Max;
 	vr::VRControllerState_t new_state = { 0 };
@@ -400,7 +400,7 @@ void CHandControllerDevice::ReportXimmerseButton(ximmerse::ControllerState contr
 }
 
 #endif
-void CHandControllerDevice::SetSixDofModuleType(ESixDofTrackingModule six_dof_module){
+void CHandControllerDevice::SetSixDofModuleType(const ESixDofTrackingModule& six_dof_module){
 	m_eSixModuleType = six_dof_module;
 	switch(m_eSixModuleType){
 		case NONE_SIX_DOF_TRACKING_MODULE:
@@ -420,12 +420,12 @@ void CHandControllerDevice::SetSixDofModuleType(ESixDofTrackingModule six_dof_mo
 	LOG(INFO) << "set controller[" << m_cControllerRole <<  "] six dof module =" << six_dof_module;
 }
 
-void CHandControllerDevice::SetReportPoseInterval(const int new_interval){
+void CHandControllerDevice::SetReportPoseInterval(const int& new_interval){
 	m_nReportPoseInterval = std::chrono::milliseconds( new_interval );
 	LOG(INFO) << "SetReportPoseInterval[" << m_cControllerRole << "]=" << new_interval << "ms.";
 }
 
-void CHandControllerDevice::SetPoseState(bool new_state){
+void CHandControllerDevice::SetPoseState(const bool& new_state){
 	m_Pose.deviceIsConnected = new_state;
 	m_Pose.poseIsValid = new_state;
 	LOG(INFO) << "set controller pose state to " << new_state ? "connect" : "disconnect";
@@ -568,7 +568,7 @@ void CHandControllerDevice::SetServerProviderHandleTrackedDevicePostMessageThrea
 }
 
 
-void CHandControllerDevice::SetTurnAroundState(const bool new_state){
+void CHandControllerDevice::SetTurnAroundState(const bool& new_state){
 	m_bTrunAround = new_state;
 	LOG(INFO) << "set turn around state:" << new_state;
 }
@@ -592,7 +592,7 @@ void CHandControllerDevice::RecenterController(){
 
 }
 
-vr::EVRButtonId CHandControllerDevice::GetDPadButton(float float_x,float float_y){
+vr::EVRButtonId CHandControllerDevice::GetDPadButton(const float& float_x,const float& float_y){
 	if(float_x > 1.0 || float_x < -1.0
 	 ||float_y > 1.0 || float_y < -1.0){
 		LOG(WARNING) << "GetDPadButton[" << m_cControllerRole << "]: error postion(" << float_x << "," << float_y << ")";
@@ -625,7 +625,7 @@ vr::EVRButtonId CHandControllerDevice::GetDPadButton(float float_x,float float_y
 	 return vr::k_EButton_Max;
 }
 
-void CHandControllerDevice::ReportControllerButton(vr::VRControllerState_t controller_state,void *p_vendor_state){
+void CHandControllerDevice::ReportControllerButton(const vr::VRControllerState_t& controller_state,void *p_vendor_state){
 	vr::EVRButtonId touch_pad_id = vr::k_EButton_Max;
 	vr::VRControllerState_t new_state = controller_state;
 	new_state.unPacketNum = m_ControllerState.unPacketNum + 1;

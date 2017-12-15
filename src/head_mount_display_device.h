@@ -96,7 +96,7 @@ public:
 		note:The frequency that this function is called is consistent with the reporting frequency. By inline, 
 		you can reduce the time you put in and out of the stack.
 	*/
-	inline vr::HmdQuaternion_t DoOrientationRecenter(const vr::HmdQuaternion_t quaternion_origin,const double yaw_offset){
+	inline vr::HmdQuaternion_t DoOrientationRecenter(const vr::HmdQuaternion_t& quaternion_origin,const double& yaw_offset){
 		double yaw_degree_new,yaw_degree_origin;
 		vr::HmdVector3d_t degree;
 		vr::HmdQuaternion_t quaternion_dest;
@@ -127,7 +127,7 @@ public:
 	/**
 		set six dof module type
 	*/
-	void SetSixDofModuleType(ESixDofTrackingModule six_dof_module);
+	void SetSixDofModuleType(const ESixDofTrackingModule& six_dof_module);
 	/**
 		set six dof data.
 	*/
@@ -135,7 +135,7 @@ public:
 	/**
 		set turn around state.
 	*/
-	void SetTurnAroundState(const bool new_state);
+	void SetTurnAroundState(const bool& new_state);
 	/**
 		set hmd position when turn around.
 	*/

@@ -4,7 +4,7 @@ namespace simple_math{
 	/**
 		transform quaternion to euler in radian.
 	*/
-	vr::HmdVector3d_t QuaternionToEulerRadian(const vr::HmdQuaternion_t quaternion)
+	vr::HmdVector3d_t QuaternionToEulerRadian(const vr::HmdQuaternion_t& quaternion)
 	{
 		vr::HmdVector3d_t euler;
 		double x,y,z,w;
@@ -37,7 +37,7 @@ namespace simple_math{
 	/**
 		tranform radian euler to quaternion.
 	*/
-	vr::HmdQuaternion_t RadianEulerToQuaternion(const vr::HmdVector3d_t euler)
+	vr::HmdQuaternion_t RadianEulerToQuaternion(const vr::HmdVector3d_t& euler)
 	{
 		vr::HmdQuaternion_t quaternion;
 		// Assuming the angles are in radians.
@@ -59,7 +59,7 @@ namespace simple_math{
 	/**
 		transform quaternion to euler in degree.
 	*/
-	vr::HmdVector3d_t QuaternionToEulerDegree(const vr::HmdQuaternion_t quaternion)
+	vr::HmdVector3d_t QuaternionToEulerDegree(const vr::HmdQuaternion_t& quaternion)
 	{
 		vr::HmdVector3d_t vector_radian = QuaternionToEulerRadian(quaternion),vector_degree;
 		RadianToDegree(vector_radian.v,vector_degree.v);
@@ -68,7 +68,7 @@ namespace simple_math{
 	/**
 		tranform degree euler to quaternion.
 	*/
-	vr::HmdQuaternion_t DegreeEulerToQuaternion(const vr::HmdVector3d_t euler)
+	vr::HmdQuaternion_t DegreeEulerToQuaternion(const vr::HmdVector3d_t& euler)
 	{
 		vr::HmdVector3d_t eule_radian;
 		DegreeToRadian(euler.v, eule_radian.v);
@@ -96,21 +96,21 @@ namespace simple_math{
 	/**
 		get yaw from quaternion in degree.
 	*/
-	double GetYawDegree(const vr::HmdQuaternion_t quaternion){
+	double GetYawDegree(const vr::HmdQuaternion_t& quaternion){
 		vr::HmdVector3d_t vector_degree = QuaternionToEulerDegree(quaternion);
 		return vector_degree.v[0];
 	}
 	/**
 		get pitch from quaternion in degree.
 	*/
-	double GetPitchDegree(const vr::HmdQuaternion_t quaternion){
+	double GetPitchDegree(const vr::HmdQuaternion_t& quaternion){
 		vr::HmdVector3d_t vector_degree = QuaternionToEulerDegree(quaternion);
 		return vector_degree.v[2];
 	}
 	/**
 		get roll from quaternion in degree.
 	*/
-	double GetRollDegree(const vr::HmdQuaternion_t quaternion){
+	double GetRollDegree(const vr::HmdQuaternion_t& quaternion){
 		vr::HmdVector3d_t vector_degree = QuaternionToEulerDegree(quaternion);
 		return vector_degree.v[1];
 	}
