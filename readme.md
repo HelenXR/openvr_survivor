@@ -87,4 +87,9 @@ Development plan
 - ~~Add recenter function.~~
 - ~~Add six dof module support(ximmerse & nolo).~~
 
+Developer activity
+------------------
+1. [openvr_survivor第一期开发活动:复位与定位追踪](http://blog.csdn.net/dabenxiong666/article/details/77720480)
+2. [openvr_survivor第二期开发活动:VR畸变](http://blog.csdn.net/dabenxiong666/article/details/78713357)
+
 This is a preliminary version, relying on personal strength is difficult to perfect, if you have any good suggestions ,you can post in [gitter chat room](https://gitter.im/openvr_survivor/Lobby),and if you would like to join us, please contact me, my mailbox:helenhololens@gmail.com. 
