@@ -8,8 +8,13 @@ CHandControllerDevice::CHandControllerDevice(string serial_number,ETrackedContro
 	memset( &m_Pose, 0, sizeof( m_Pose ) );
 	m_Pose.willDriftInYaw = true;
 	m_Pose.shouldApplyHeadModel = false;
-	m_Pose.deviceIsConnected = false;
-	m_Pose.poseIsValid = false;
+	#if defined(CONTROLLER_ROTATE_BY_KEYBOARD) && defined(CONTROLLER_POSITION_BY_KEYBOARD)
+		m_Pose.deviceIsConnected = true;
+		m_Pose.poseIsValid = true;
+	#else
+		m_Pose.deviceIsConnected = false;
+		m_Pose.poseIsValid = false;
+	#endif
 	m_Pose.result = ETrackingResult::TrackingResult_Running_OK;
 	m_Pose.qRotation = HmdQuaternion_Init( 1, 0, 0, 0 );
 	m_Pose.qWorldFromDriverRotation = HmdQuaternion_Init( 1, 0, 0, 0 );

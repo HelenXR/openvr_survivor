@@ -14,15 +14,15 @@
 //if your HMD don't have IMU hardware to provide rotate information,you can use keyboard instead for your HMD.
 #define HMD_ROTATE_BY_KEYBOARD
 //if your HMD don't have position hardware to provide position information,you can use keyboard instead for your HMD.
-//#define HMD_POSITION_BY_KEYBOARD
+#define HMD_POSITION_BY_KEYBOARD
 //if your controller don't have IMU hardware to provide rotate information,you can use keyboard instead for your controller.
-//#define CONTROLLER_ROTATE_BY_KEYBOARD
+#define CONTROLLER_ROTATE_BY_KEYBOARD
 //if your controller don't have position hardware to provide position information,you can use keyboard instead for your controller.
-//#define CONTROLLER_POSITION_BY_KEYBOARD
+#define CONTROLLER_POSITION_BY_KEYBOARD
 
 //use ximmerse tracking module
 //#define USE_XIMMERSE_SIX_DOF_TRACKING_MODULE
 //use nolo tracking module
-#define USE_NOLO_SIX_DOF_TRACKING_MODULE
+//#define USE_NOLO_SIX_DOF_TRACKING_MODULE
 
 #endif

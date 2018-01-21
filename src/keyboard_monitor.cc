@@ -214,7 +214,7 @@ void KeyBoardMonitor::KeyBoardForControllerPoseAndButtonUpdate() {
 
 	//RIGHT HAND pose update
 #if defined(CONTROLLER_ROTATE_BY_KEYBOARD)
-#define KEYBOARD_FOR_CONTROLLER_ROTATE_STEP_DEGREE                  10
+#define KEYBOARD_FOR_CONTROLLER_ROTATE_STEP_DEGREE                  2
 	if (KBC(VK_KEY_J)) {
 		m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation = glm_adapter::RotateQuaternionByYawPitchRoll(m_sControllerPose[RIGHT_HAND_CONTROLLER].qRotation, KEYBOARD_FOR_CONTROLLER_ROTATE_STEP_DEGREE, 0, 0);
 		LOG(INFO) << "J Click!" << endl;
@@ -305,6 +305,7 @@ void KeyBoardMonitor::KeyBoardForControllerPoseAndButtonUpdate() {
 
 	//right hand button update
 	uint16_t button_state = 0x00;
+	float trigger_x;
 	if (KBT(VK_BACK)) {
 		button_state |= CONTROLLER_BUTTON_MENU;
 		LOG(INFO) << "VK_BACK Touch!" << endl;
@@ -335,6 +336,7 @@ void KeyBoardMonitor::KeyBoardForControllerPoseAndButtonUpdate() {
 	}
 	if (KBT(VK_SPACE)) {
 		button_state |= CONTROLLER_BUTTON_TRIGGER;
+		trigger_x = 1.0;
 		LOG(INFO) << "VK_SPACE Touch!" << endl;
 	}
 	if (KBT(VK_KEY_9)) {
@@ -346,7 +348,7 @@ void KeyBoardMonitor::KeyBoardForControllerPoseAndButtonUpdate() {
 		LOG(INFO) << "VK_KEY_0 Touch!" << endl;
 	}
 	//for test
-	float trigger_x;
+	/*float trigger_x;
 	if (KBT(VK_KEY_7)) {
 		trigger_x = 0.2f;
 		LOG(INFO) << "VK_KEY_7 Touch!" << endl;
@@ -354,7 +356,7 @@ void KeyBoardMonitor::KeyBoardForControllerPoseAndButtonUpdate() {
 	if (KBT(VK_KEY_8)) {
 		trigger_x = 0.8f;
 		LOG(INFO) << "VK_KEY_8 Touch!" << endl;
-	}
+	}*/
 	m_KeyBoardForControllerButton[RIGHT_HAND_CONTROLLER].ButtonState = button_state;
 	m_KeyBoardForControllerButton[RIGHT_HAND_CONTROLLER].rAxis[1].x = trigger_x;
 
