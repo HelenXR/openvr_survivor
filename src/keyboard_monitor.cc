@@ -55,7 +55,7 @@ KeyBoardForControllerButton KeyBoardMonitor::GetControllerButtonState(const EHan
 }
 void KeyBoardMonitor::DetectKeyBoardThread() {
 	LOG(INFO) << "DetectKeyBoardThread:run!";
-	auto retryInterval = std::chrono::milliseconds(100);
+	auto retryInterval = std::chrono::milliseconds(16);
 	auto pollDeadline = std::chrono::steady_clock::now();
 
 	while (m_bDetectKeyBoardThreadState) {

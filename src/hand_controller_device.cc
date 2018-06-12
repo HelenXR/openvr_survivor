@@ -137,8 +137,17 @@ void CHandControllerDevice::EnterStandby(){
 
 }
 void *CHandControllerDevice::GetComponent( const char *pchComponentNameAndVersion ){
-	void *p = NULL;
-	return p;
+
+	if (!_stricmp(pchComponentNameAndVersion, vr::IVRControllerComponent_Version))
+	{
+		return (IVRControllerComponent*)this;
+	}
+	if (!_stricmp(pchComponentNameAndVersion, vr::ITrackedDeviceServerDriver_Version))
+	{
+		return (ITrackedDeviceServerDriver*)this;
+	}
+
+	return NULL;
 }
 void CHandControllerDevice::DebugRequest( const char *pchRequest, char *pchResponseBuffer, uint32_t unResponseBufferSize ){
 
@@ -246,45 +255,25 @@ void CHandControllerDevice::ReportPoseButtonThread(){
 	LOG(INFO) << "ReportPoseThread:exit!" ;
 }
 void CHandControllerDevice::GetButtonState(const KeyBoardForControllerButton& button_state) {
-	VRControllerState_t new_state = { 0 };
-	new_state.unPacketNum = m_ControllerState.unPacketNum + 1;
+	vr::VRControllerState_t vr_controller_state = {};
+	if(button_state.ButtonState & CONTROLLER_BUTTON_TRIGGER){
+		vr_controller_state.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Trigger);
+		vr_controller_state.rAxis[1].x = 1.0f;
+		vr_controller_state.rAxis[1].y = 0.0f;		
+		LOG(INFO) << "GetButtonState:CONTROLLER_BUTTON_TRIGGER";
+	}
+	if(button_state.ButtonState & CONTROLLER_BUTTON_MENU){
+		vr_controller_state.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu);
+		LOG(INFO) << "GetButtonState:CONTROLLER_BUTTON_MENU";
+	}
+	if(button_state.ButtonState & CONTROLLER_BUTTON_SYSTEM){
+		vr_controller_state.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_System);
+		LOG(INFO) << "GetButtonState:CONTROLLER_BUTTON_SYSTEM";
+	}
 
-	if (button_state.ButtonState & CONTROLLER_BUTTON_MENU)
-		new_state.ulButtonPressed |= ButtonMaskFromId(k_EButton_ApplicationMenu);
-	if (button_state.ButtonState & CONTROLLER_BUTTON_PAD_LEFT)
-		new_state.ulButtonPressed |= ButtonMaskFromId(k_EButton_DPad_Left);
-	if (button_state.ButtonState & CONTROLLER_BUTTON_PAD_UP)
-		new_state.ulButtonPressed |= ButtonMaskFromId(k_EButton_DPad_Up);
-	if (button_state.ButtonState & CONTROLLER_BUTTON_PAD_RIGHT)
-		new_state.ulButtonPressed |= ButtonMaskFromId(k_EButton_DPad_Right);
-	if (button_state.ButtonState & CONTROLLER_BUTTON_PAD_DOWN)
-		new_state.ulButtonPressed |= ButtonMaskFromId(k_EButton_DPad_Down);
-	if (button_state.ButtonState & CONTROLLER_BUTTON_SYSTEM)
-		new_state.ulButtonPressed |= ButtonMaskFromId(k_EButton_System);
-	if (button_state.ButtonState & CONTROLLER_BUTTON_TRIGGER)
-		new_state.ulButtonPressed |= ButtonMaskFromId(k_EButton_SteamVR_Trigger);
-	if (button_state.ButtonState & CONTROLLER_BUTTON_GRIP)
-		new_state.ulButtonPressed |= ButtonMaskFromId(k_EButton_Grip);
-//	if (button_state.ButtonState & CONTROLLER_BUTTON_TRACKEPAD_PRESS)
-//		new_state.ulButtonPressed |= ;
+	//add your button like above...
 	
-	new_state.ulButtonTouched |= new_state.ulButtonPressed;
-
-	uint64_t ulChangedTouched = new_state.ulButtonTouched ^ m_ControllerState.ulButtonTouched;
-	uint64_t ulChangedPressed = new_state.ulButtonPressed ^ m_ControllerState.ulButtonPressed;
-
-	SendButtonUpdates(&vr::IVRServerDriverHost::TrackedDeviceButtonTouched, ulChangedTouched & new_state.ulButtonTouched);
-	SendButtonUpdates(&vr::IVRServerDriverHost::TrackedDeviceButtonPressed, ulChangedPressed & new_state.ulButtonPressed);
-	SendButtonUpdates(&vr::IVRServerDriverHost::TrackedDeviceButtonUnpressed, ulChangedPressed & ~new_state.ulButtonPressed);
-	SendButtonUpdates(&vr::IVRServerDriverHost::TrackedDeviceButtonUntouched, ulChangedTouched & ~new_state.ulButtonTouched);
-
-	new_state.rAxis[1].x = button_state.rAxis[1].x;
-	new_state.rAxis[1].y = 0.0f;
-
-	if (new_state.rAxis[1].x != m_ControllerState.rAxis[1].x)
-		vr::VRServerDriverHost()->TrackedDeviceAxisUpdated(m_nUniqueObjectId, 1, new_state.rAxis[1]);
-
-	m_ControllerState = new_state;
+	ReportControllerButton(vr_controller_state,NULL);
 }
 
 void CHandControllerDevice::SendButtonUpdates(ButtonUpdate ButtonEvent, uint64_t ulMask)
